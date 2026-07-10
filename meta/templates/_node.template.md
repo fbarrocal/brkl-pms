@@ -32,4 +32,4 @@ Synthesized prose in the agent's own words. The frontmatter fields above are opt
 - …
 
 ## Sources
-- Which `sources/` items contributed to this page.
+- Which source items contributed to this page (after ingest they live in `sources/archive/`).

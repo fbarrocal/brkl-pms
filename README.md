@@ -50,12 +50,20 @@ Both tools can share this folder safely: each keeps its session state in its own
 - **Curator + graph in one.** The agent reads the pending items in `sources/` and writes synthesized node pages into `content/`, connecting them with **typed edges**.
 - **Nodes are typed.** Every page in the flat `content/` folder has a `type:` (e.g. `entity`, `concept`, or a KB-specific type like `person` or `character`). The frontmatter is the structured catalog layer; the prose body is the knowledge layer — both at once.
 - **Templates are optional.** Define a template per node type in `meta/templates/` (starting from the generic seed) when a kind of thing recurs enough to deserve structure; skip it otherwise.
-- **Edges are typed frontmatter fields** — a relationship is a frontmatter field named for the predicate, holding wikilinks (e.g. `part_of: ["[[A Larger Thing]]"]`, `contradicts: ["[[A Rival Claim]]"]`). Because it's plain frontmatter, Dataview, Breadcrumbs, Juggl, and Graph Link Types can all read the graph — no plugin required.
+- **Edges are typed frontmatter fields** — a relationship is a frontmatter field named for the predicate, holding wikilinks (e.g. `part_of: ["[[A Larger Thing]]"]`, `contradicts: ["[[A Rival Claim]]"]`). Because it's plain frontmatter, the whole Obsidian metadata ecosystem can read the graph — no plugin required (see **How to read the content**).
 - **Retrieval is navigation, not vector search.** The agent reads `meta/index.md` and traverses typed edges — no embeddings.
 
 ## How to read the content
 
-Everything is plain markdown, so any editor works. `meta/index.md` is the reading entry point (nodes grouped by type), and because the edges are plain frontmatter, tools like Dataview can table the catalog (`file.part_of`, `file.uses`, …).
+Everything is plain markdown, so any editor works. `meta/index.md` is the reading entry point (nodes grouped by type), and because the edges are plain frontmatter, these tools consume the typed graph directly:
+
+| Tool | Reads the typed edges via |
+|---|---|
+| Obsidian core graph | frontmatter links render natively (plain, unlabeled lines) |
+| Dataview | frontmatter fields directly (`file.part_of`, `file.uses`, …) |
+| Graph Link Types | Dataview metadata — draws each predicate as a label on the graph edge |
+| Breadcrumbs | frontmatter fields you map as relation types in its settings |
+| Juggl | Dataview metadata |
 
 ### Obsidian
 
@@ -63,10 +71,12 @@ Everything is plain markdown, so any editor works. `meta/index.md` is the readin
 
 With the vault at the root, the machinery (`CLAUDE.md`, `meta/`, …) shows up in search and graph. Two ways to hide it:
 
-- **Excluded files (recommended, travels with the KB).** Settings → **Files and links → Excluded files** → add `meta/`, `sources/`, `CLAUDE.md`, `README.md`, `SETTINGS.md`. This removes them from search, link suggestions, and the graph. The setting lives in the vault's config (`.obsidian/app.json`), which the included `.gitignore` keeps versioned — configure once, and every clone of the KB inherits it. Drop `sources/` from the list if you want raw inputs visible.
-- **Graph filter (quick, per-machine).** In the graph view's **Filters** panel, type `path:content` (or `-path:meta`) in the search field. Instant, but it's stored in `.obsidian/workspace.json`, which is gitignored — so it stays on that machine only.
+- **Excluded files (recommended — hides machinery everywhere).** Settings → **Files and links → Excluded files** → add `meta/`, `sources/`, `CLAUDE.md`, `README.md`, `SETTINGS.md`. This removes them from search, link suggestions, *and* the graph. Drop `sources/` from the list if you want raw inputs visible.
+- **Graph filter (graph-only).** In the graph view's **Filters** panel, type `path:content` (or `-path:meta`). Only the graph is affected — search and link suggestions still see the machinery.
 
-Two graph notes: links inside frontmatter render in the core graph as plain, unlabeled lines — so your typed edges do appear natively; for *labeled* edges (seeing `part_of` vs `uses` on the line), use the Graph Link Types or Juggl plugins from the compatibility list above. And if the graph ever looks too sparse, remember prose `[[wikilinks]]` also draw lines — only the frontmatter fields are the real typed graph.
+Both settings are vault config (`.obsidian/app.json` and `.obsidian/graph.json`), and the included `.gitignore` versions vault config while excluding only local UI state (`workspace.json`) — so configure either once, commit, and every clone of the KB inherits it.
+
+Two graph notes: links inside frontmatter render in the core graph as plain, unlabeled lines — so your typed edges do appear natively; for *labeled* edges (seeing `part_of` vs `uses` on the line), use the Graph Link Types or Juggl plugins (table above). And if the graph ever looks too sparse, remember prose `[[wikilinks]]` also draw lines — only the frontmatter fields are the real typed graph.
 
 ## If the agent doesn't pick up an operation
 

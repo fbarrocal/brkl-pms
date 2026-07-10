@@ -13,7 +13,7 @@ Answer from the knowledge base. Two modes; pick based on the question. In both: 
 
 For "what do I know about X", "summarize my thinking on Y":
 
-1. From the index, find candidate pages by title, alias, tag.
+1. From the index, find candidate pages by title; for `aliases` and `tags`, search the frontmatter across `content/` — the index lists titles, not aliases.
 2. Read those synthesized pages and answer from them.
 3. Cite the pages you used: `[[Page]]`.
 

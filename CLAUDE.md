@@ -52,7 +52,9 @@ authored_by:
   - "[[A Person]]"
 ```
 
-The agent writes these fields directly — in Cowork and Claude Code alike. The user can also edit them by hand in Obsidian's Properties panel. Because this is plain frontmatter, Dataview, Breadcrumbs, Juggl, and Graph Link Types can all read the graph (details in README); no plugin is required. A plain `[[wikilink]]` in prose with no matching frontmatter field is **not** a typed edge — only the per-predicate fields are traversed; "following an edge" means reading/searching those fields (a grep in Claude Code, a file scan in Cowork). Only the forward field is stored on the origin page; inverses are for reading — don't hand-write inverse fields. For a genuinely untyped "loosely related" link, use `see_also:` — it is NOT a typed edge and is never traversed; if one keeps mattering, lint prompts to promote it.
+The agent writes these fields directly — in Cowork and Claude Code alike. The user can also edit them by hand in Obsidian's Properties panel. Because this is plain frontmatter, Dataview, Breadcrumbs, Juggl, and Graph Link Types can all read the graph (details in README); no plugin is required.
+
+A plain `[[wikilink]]` in prose with no matching frontmatter field is **not** a typed edge — only the per-predicate fields are traversed; "following an edge" means reading/searching those fields (a grep in Claude Code, a file scan in Cowork). Only the forward field is stored on the origin page; inverses are for reading — don't hand-write inverse fields. For a genuinely untyped "loosely related" link, use `see_also:` — it is NOT a typed edge and is never traversed; if one keeps mattering, lint prompts to promote it.
 
 ## Sources
 
