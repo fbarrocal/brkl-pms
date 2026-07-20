@@ -14,7 +14,7 @@ The health check that substitutes for the guarantees an external database would 
 Run all of these across `content/` (and `sources/` for #8):
 
 1. **Missing or unregistered node types.** Any node with no `type` at all, or whose `type` is not in `SETTINGS.md` § Nodes. Propose registering it (via the setup skill) or reassigning it to an existing type.
-2. **Settings drift.** A registered type whose template in `meta/templates/` is missing, or whose fields disagree with its entry in `SETTINGS.md` § Nodes. Propose aligning them. Also flag orphan templates (a `meta/templates/<type>.md` with no matching entry in § Nodes), and flag if `setup_done` is `true` in `SETTINGS.md` but its Purpose is still unset.
+2. **Settings drift.** A registered type whose template in `meta/templates/` is missing, or whose fields disagree with its entry in `SETTINGS.md` § Nodes. Propose aligning them. Also flag orphan templates (a `meta/templates/<type>.md` with no matching entry in § Nodes), and flag if `setup_done` is `true` in `SETTINGS.md` but its Purpose or Language is still unset. Also flag content pages whose titles or prose are plainly not in the recorded Language — mixed-language vaults are a slow drift that only shows up once they are expensive to fix.
 3. **Invalid predicates.** Any edge field whose name is not in `SETTINGS.md` § Edges. Propose mapping it to an allowed predicate, or registering a new one via the setup skill.
 4. **Untyped links to promote.** Prose `[[wikilinks]]` (or `see_also` entries) that recur but have no matching predicate field. Propose a predicate to promote each — or confirm it stays `see_also`.
 5. **Dangling edges.** Predicate-field wikilinks whose target page doesn't exist. Offer to create a stub or fix the target.
@@ -25,6 +25,7 @@ Run all of these across `content/` (and `sources/` for #8):
 10. **Scale watch.** Rough page/token count; warn if approaching the ~150–200 page ceiling where an external index becomes worth adding.
 11. **Provenance gaps.** Content pages with an empty or missing `sources:` field, `sources:` entries pointing at a file that isn't in `sources/`, and **broken round-trips** — a page listing a source that doesn't list it back in `touches:`, or vice versa. An unsourced page is the shape a fabricated one takes, so this check is worth running every pass.
 12. **Unstamped sources.** Files in `sources/` missing the source frontmatter block, and binaries with no `<filename>.md` sidecar. Propose stamping them (via ingest) so they can be processed.
+13. **One-sided symmetric edges.** For each predicate marked **(symmetric)** in `SETTINGS.md` § Edges, a page carrying it must appear in the same field on the page it points at. Report any that don't. This is the one check whose fix needs no judgment — the repair is always "mirror it" — so propose applying all of them in one go rather than asking page by page. It matters most for `contradicts`: an unmirrored conflict is invisible from the page being challenged.
 
 ## Report format
 
@@ -45,6 +46,7 @@ KB Lint — <date>
 10. Scale: ~40 pages — healthy
 11. Provenance (N): [[G]] has no `sources:` → which source built it?
 12. Unstamped sources (N): sources/report.pdf has no sidecar → stamp it?
+13. One-sided symmetric edges (N): [[H]] contradicts [[I]], not mirrored → mirror all?
 ```
 
 ## Applying fixes

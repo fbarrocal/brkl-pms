@@ -10,6 +10,12 @@ Everything specific to THIS knowledge base lives here: its purpose, its node typ
 
 _(unset — first-run setup records here, in one or two sentences, what this KB is for. Every ingest and query reads this to guide what to extract and how to type it.)_
 
+## Language
+
+_(unset — first-run setup records here the language for node titles, prose bodies, and answers.)_
+
+This governs **content**, not conversation: the user may chat in one language and want the vault in another. Field names, node types, and edge predicates always stay in English — they are schema, not prose. Changing this after pages exist means retitling nodes, which breaks every wikilink pointing at them, so treat a change as a migration, not an edit.
+
 ## Nodes
 
 The node types active in this KB. Ships with two generic defaults; first-run setup adds KB-specific ones. For each type: its name, what it represents, its fields, and its template file (if any).
@@ -24,7 +30,7 @@ Each new type: (1) copy meta/templates/_node.template.md to meta/templates/<type
 
 ## Edges
 
-The predicates (typed-edge field names) active in this KB. Ships with a general-purpose core; setup may add KB-specific ones. Edges are directional; only the forward field is stored on the origin page (inverses are for reading). Do not invent predicates outside this list — propose additions here instead.
+The predicates (typed-edge field names) active in this KB. Ships with a general-purpose core; setup may add KB-specific ones. Edges are directional; only the forward field is stored on the origin page (inverses are for reading). A predicate marked **(symmetric)** in the inverse column is the exception — it is written on both pages. That marker is load-bearing: it is what makes the mirroring rule in `CLAUDE.md` fire, so mark any new symmetric predicate accordingly. Do not invent predicates outside this list — propose additions here instead.
 
 | predicate (field) | meaning (A → B) | inverse |
 |---|---|---|

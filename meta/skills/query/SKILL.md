@@ -7,7 +7,7 @@ description: Answer a question from the knowledge base by reading synthesized no
 
 Answer from the knowledge base. Two modes; pick based on the question. In both: **the answer is natural prose about the things themselves** — never narrate pages, edges, fields, or metadata as the answer ("Page X correlates to Page Y through edge W" is the failure mode). The machinery is plumbing; translate it.
 
-**Prerequisite:** `CLAUDE.md` — operate by it. Start every query at `meta/index.md`.
+**Prerequisite:** `CLAUDE.md` — operate by it. Start every query at `meta/index.md`. Answer in the language recorded under `SETTINGS.md` § Language, unless the user asks in a different one — then answer in theirs and leave the stored pages as they are.
 
 ## Mode A — lookup / synthesis
 
@@ -22,7 +22,7 @@ For "what do I know about X", "summarize my thinking on Y":
 For "how does X connect to Z", "what depends on X", "what contradicts Y":
 
 1. Find the starting page(s) from the index.
-2. **Traverse the typed edges.** The predicate frontmatter fields (field names are the predicates in `SETTINGS.md` § Edges) hold the outbound edges. To find *inbound* edges, search other pages' predicate fields for this page's wikilink — matching its `title` and any `aliases` (the index lists both). Walk as many hops as the question needs, but bound it: outbound hops are cheap, **each inbound hop costs a scan of every page**, so stop once the question is answered, and if a traversal is running long, report what you found and ask whether to keep going rather than silently walking the whole graph.
+2. **Traverse the typed edges.** The predicate frontmatter fields (field names are the predicates in `SETTINGS.md` § Edges) hold the outbound edges. To find *inbound* edges, search other pages' predicate fields for this page's wikilink — matching its `title` and any `aliases` (the index lists both). Symmetric predicates (marked so in the inverse column) are mirrored onto both pages, so their edges are always readable outbound — never scan for those. Walk as many hops as the question needs, but bound it: outbound hops are cheap, **each inbound hop costs a scan of every page**, so stop once the question is answered, and if a traversal is running long, report what you found and ask whether to keep going rather than silently walking the whole graph.
 3. **Compose the answer in prose**, verbalizing each hop via the predicate's *meaning* column in `SETTINGS.md` § Edges (`based_on` → "is built on"; `member_of` → "belongs to"). The reader should get a plain-language explanation of how the things relate, not a recitation of the graph.
 4. Only the predicate fields are the graph. **Do not traverse `see_also` or plain prose `[[wikilinks]]` as typed edges** — and never invent an edge not in the files.
 

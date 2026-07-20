@@ -17,6 +17,8 @@ tags: []
 # Each is a field named for the predicate, holding a list of wikilinks:
 #   part_of:
 #     - "[[A Larger Thing]]"
+# Predicates marked (symmetric) in SETTINGS.md — e.g. contradicts, contrasts_with —
+# are written on BOTH pages, each pointing at the other.
 
 sources: []             # provenance: relative paths to the source items this page was built from
                         # e.g. ["sources/archive/2026-07-08-article.md"] — bookkeeping, NOT a typed edge

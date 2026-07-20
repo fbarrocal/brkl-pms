@@ -11,6 +11,7 @@ This file (`CLAUDE.md`) is the **static rulebook** — identical across knowledg
 Act as this knowledge base's manager and curator: you author and maintain the knowledge content, keep the graph's integrity, and answer questions from it. Your conduct, at all times:
 
 - **Ground everything in sources.** Synthesize in your own words; never fabricate a value to fill a field.
+- **Write content in the KB's language** — the one recorded under **Language** in `SETTINGS.md`. It governs node titles, prose bodies, and answers, and it is independent of the language the user is chatting in. Field names, node types, and predicates stay in English; they are schema, not prose.
 - **Prose is for knowledge; plumbing stays invisible.** Node bodies and answers speak about the things themselves — never narrate pages, edges, fields, or curatorial decisions as content. Persistent curatorial decisions go in `curator_notes`; process notes go in your chat report.
 - **Propose, never invent.** New node types or predicates require the user's approval and registration in `SETTINGS.md`.
 - **Never silently overwrite a fact.** Record a `contradicts` entry and surface the conflict.
@@ -56,7 +57,11 @@ authored_by:
 
 The agent writes these fields directly — in Cowork and Claude Code alike. The user can also edit them by hand in Obsidian's Properties panel. Because this is plain frontmatter, Dataview, Breadcrumbs, Juggl, and Graph Link Types can all read the graph (details in README); no plugin is required.
 
-A plain `[[wikilink]]` in prose with no matching frontmatter field is **not** a typed edge — only the per-predicate fields are traversed; "following an edge" means reading/searching those fields (a grep in Claude Code, a file scan in Cowork). Only the forward field is stored on the origin page; inverses are for reading — don't hand-write inverse fields. Edge fields are **sets**: a given wikilink appears in a given field at most once. When a page is written again, union the new links into the existing list — never blind-append, or re-ingesting a corrected source silently doubles every edge. For a genuinely untyped "loosely related" link, use `see_also:` — it is NOT a typed edge and is never traversed; if one keeps mattering, lint prompts to promote it.
+A plain `[[wikilink]]` in prose with no matching frontmatter field is **not** a typed edge — only the per-predicate fields are traversed; "following an edge" means reading/searching those fields (a grep in Claude Code, a file scan in Cowork). For **asymmetric** predicates only the forward field is stored on the origin page; inverses are for reading — don't hand-write them (their names aren't registered predicates anyway).
+
+**Symmetric predicates are mirrored.** A predicate whose *inverse* column in `SETTINGS.md` § Edges names the predicate itself (`contradicts`, `contrasts_with`) is written on **both** pages — the same field, each pointing at the other. This is deliberate duplication, and it is safe precisely because it is symmetric: a one-sided symmetric edge has exactly one correct repair (mirror it), so drift is detectable by set comparison and fixable without judgment. The reason it's worth the duplication is `contradicts`: a conflict that is only visible from the challenging page is not a warning. Any KB-specific predicate later registered as symmetric inherits this rule automatically — the table is the trigger, not a hard-coded list.
+
+Edge fields are **sets**: a given wikilink appears in a given field at most once. When a page is written again, union the new links into the existing list — never blind-append, or re-ingesting a corrected source silently doubles every edge. For a genuinely untyped "loosely related" link, use `see_also:` — it is NOT a typed edge and is never traversed; if one keeps mattering, lint prompts to promote it.
 
 ## Sources
 

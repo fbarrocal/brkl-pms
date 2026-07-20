@@ -11,13 +11,14 @@ Configures `SETTINGS.md` — the only rules file this skill edits (plus creating
 
 ## Mode 1 — First run (`setup_done` false or `SETTINGS.md` missing)
 
-Interview the user with the AskUserQuestion tool (structured options); fall back to plain chat questions if the tool is unavailable. Keep it to three questions:
+Interview the user with the AskUserQuestion tool (structured options); fall back to plain chat questions if the tool is unavailable. Ask the questions themselves in whatever language the user is writing to you in. Keep it to four questions:
 
 1. **Purpose.** What is this KB for — a topic, a book, a project, personal notes, learning material, a research area? Offer common options plus free text.
 2. **Node types.** Based on the purpose, propose a small set to create. Examples: professional KB → `person`, `project`, `team`, `meeting`; a book → `character`, `place`, `event`; learning material → `formula`, `recipe`, `term`. The user approves, adjusts, or rejects each; the generic `entity` and `concept` always remain available.
 3. **Edges.** Ask whether the generic predicate set in `SETTINGS.md` § Edges needs KB-specific additions — a book might want `ally_of` / `enemy_of`; a project KB might want `owns` / `blocks`. Propose; the user approves.
+4. **Language.** What language should the *content* be written in — node titles, prose bodies, and answers? Default to the language the user is writing in, and offer the alternatives explicitly, because chat language and content language often differ (a user may write to you in Portuguese but want an English vault, or the reverse). This is the one setting that is expensive to change later: it is baked into every page title, and retitling pages breaks every wikilink pointing at them. Ask it even when the answer seems obvious.
 
-Then write it down: record the purpose under **Purpose**; create each approved template in `meta/templates/` by replicating `meta/templates/_node.template.md`; register the types under **Nodes** and any new predicates under **Edges**; set `setup_done: true` in `SETTINGS.md`'s frontmatter. Templates are optional — the user can skip them and add later when a kind of thing recurs enough to deserve structure. Close with a one-line summary of what was configured and how to start (drop a file in `sources/`, ask to ingest).
+Then write it down: record the purpose under **Purpose** and the chosen language under **Language**; create each approved template in `meta/templates/` by replicating `meta/templates/_node.template.md`; register the types under **Nodes** and any new predicates under **Edges**; set `setup_done: true` in `SETTINGS.md`'s frontmatter. Templates are optional — the user can skip them and add later when a kind of thing recurs enough to deserve structure. Close with a one-line summary of what was configured and how to start (drop a file in `sources/`, ask to ingest).
 
 ## Mode 2 — Schema changes (`setup_done` true)
 
