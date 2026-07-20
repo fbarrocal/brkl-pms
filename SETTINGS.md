@@ -14,12 +14,12 @@ _(unset — first-run setup records here, in one or two sentences, what this KB 
 
 The node types active in this KB. Ships with two generic defaults; first-run setup adds KB-specific ones. For each type: its name, what it represents, its fields, and its template file (if any).
 
-- **`entity`** — a specific thing (a person, place, work, object, event). Fields: `title`, `aliases`, `tags`, typed-edge fields, `see_also`. Template: none (follows the generic seed `meta/templates/_node.template.md` shape).
+- **`entity`** — a specific thing (a person, place, work, object, event). Fields: `title`, `aliases`, `tags`, typed-edge fields, `sources`, `see_also`. Template: none (follows the generic seed `meta/templates/_node.template.md` shape).
 - **`concept`** — an idea, theme, or topic. Fields: same as `entity`. Template: none (same seed shape).
 
 <!-- Add KB-specific node types here during setup, e.g.:
-- `person` — a human relevant to this KB. Fields: title, aliases, role, org, edges, see_also. Template: meta/templates/person.md
-- `project` — a piece of work. Fields: title, status, edges, see_also. Template: meta/templates/project.md
+- `person` — a human relevant to this KB. Fields: title, aliases, role, org, edges, sources, see_also. Template: meta/templates/person.md
+- `project` — a piece of work. Fields: title, status, edges, sources, see_also. Template: meta/templates/project.md
 Each new type: (1) copy meta/templates/_node.template.md to meta/templates/<type>.md, (2) register it here. -->
 
 ## Edges

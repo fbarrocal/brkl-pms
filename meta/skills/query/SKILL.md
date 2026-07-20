@@ -13,7 +13,7 @@ Answer from the knowledge base. Two modes; pick based on the question. In both: 
 
 For "what do I know about X", "summarize my thinking on Y":
 
-1. From the index, find candidate pages by title; for `aliases` and `tags`, search the frontmatter across `content/` — the index lists titles, not aliases.
+1. From the index, find candidate pages — its entries carry both titles and aliases, so a name the user used resolves there in one read. Only `tags` still require searching frontmatter across `content/`. If a name you'd expect is missing from the index, scan `content/` as a fallback and mention that the index looks stale.
 2. Read those synthesized pages and answer from them.
 3. Cite the pages you used: `[[Page]]`.
 
@@ -22,7 +22,7 @@ For "what do I know about X", "summarize my thinking on Y":
 For "how does X connect to Z", "what depends on X", "what contradicts Y":
 
 1. Find the starting page(s) from the index.
-2. **Traverse the typed edges.** The predicate frontmatter fields (field names are the predicates in `SETTINGS.md` § Edges) hold the outbound edges. To find *inbound* edges, search other pages' predicate fields for this page's wikilink — matching its `title` and any `aliases`, since edges may point at either. Walk as many hops as the question needs.
+2. **Traverse the typed edges.** The predicate frontmatter fields (field names are the predicates in `SETTINGS.md` § Edges) hold the outbound edges. To find *inbound* edges, search other pages' predicate fields for this page's wikilink — matching its `title` and any `aliases` (the index lists both). Walk as many hops as the question needs, but bound it: outbound hops are cheap, **each inbound hop costs a scan of every page**, so stop once the question is answered, and if a traversal is running long, report what you found and ask whether to keep going rather than silently walking the whole graph.
 3. **Compose the answer in prose**, verbalizing each hop via the predicate's *meaning* column in `SETTINGS.md` § Edges (`based_on` → "is built on"; `member_of` → "belongs to"). The reader should get a plain-language explanation of how the things relate, not a recitation of the graph.
 4. Only the predicate fields are the graph. **Do not traverse `see_also` or plain prose `[[wikilinks]]` as typed edges** — and never invent an edge not in the files.
 

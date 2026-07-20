@@ -18,6 +18,8 @@ tags: []
 #   part_of:
 #     - "[[A Larger Thing]]"
 
+sources: []             # provenance: relative paths to the source items this page was built from
+                        # e.g. ["sources/archive/2026-07-08-article.md"] — bookkeeping, NOT a typed edge
 see_also: []            # untyped soft links — NOT traversed as graph edges
 # curator_notes: ""     # optional persistent curatorial context (e.g. intentionally distinct from [[X]]); respected by dedup/lint, never restated in prose
 created: <YYYY-MM-DD>
@@ -32,4 +34,4 @@ Synthesized prose in the agent's own words. The frontmatter fields above are opt
 - …
 
 ## Sources
-- Which source items contributed to this page (after ingest they live in `sources/archive/`).
+Optional human-readable notes on what came from where. The authoritative record is the `sources:` frontmatter field above — that's what lint checks and what a source correction is traced through. Don't let the two disagree; if you only maintain one, maintain the frontmatter.

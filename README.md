@@ -49,6 +49,8 @@ Both tools can share this folder safely: each keeps its session state in its own
 
 - **Curator + graph in one.** The agent reads the pending items in `sources/` and writes synthesized node pages into `content/`, connecting them with **typed edges**.
 - **Nodes are typed.** Every page in the flat `content/` folder has a `type:` (e.g. `entity`, `concept`, or a KB-specific type like `person` or `character`). The frontmatter is the structured catalog layer; the prose body is the knowledge layer — both at once.
+- **Provenance runs both ways.** Each node carries a `sources:` field listing the source items it was built from, and each source carries `touches:` listing the pages it fed. Lint checks the round-trip, so a page nothing supports is visible rather than plausible.
+- **Drop anything in `sources/`.** Files don't need to arrive tagged — ingest stamps the bookkeeping frontmatter it needs. Binaries (PDFs, images, audio) get a small `.md` sidecar that carries that frontmatter for them.
 - **Templates are optional.** Define a template per node type in `meta/templates/` (starting from the generic seed) when a kind of thing recurs enough to deserve structure; skip it otherwise.
 - **Edges are typed frontmatter fields** — a relationship is a frontmatter field named for the predicate, holding wikilinks (e.g. `part_of: ["[[A Larger Thing]]"]`, `contradicts: ["[[A Rival Claim]]"]`). Because it's plain frontmatter, the whole Obsidian metadata ecosystem can read the graph — no plugin required (see **How to read the content**).
 - **Retrieval is navigation, not vector search.** The agent reads `meta/index.md` and traverses typed edges — no embeddings.
