@@ -29,12 +29,17 @@ your-kb-folder/
 ├── content/              # knowledge only — all node pages, flat; type is a field
 └── meta/                 # the machinery (visible on purpose)
     ├── index.md          # navigation entry point
+    ├── host-snippet.md   # pointer block for a host project's CLAUDE.md (embedded installs)
     ├── skills/           # setup / ingest / query / lint — single source of truth
     └── templates/        # optional node templates
         └── _node.template.md  # generic seed — copy to meta/templates/<type>.md
 ```
 
 The split that matters: `CLAUDE.md` is static and identical across all your knowledge bases — the agent never edits it. Everything specific to THIS KB lives in `SETTINGS.md`, the only rules file the agent writes. Knowledge (`sources/`, `content/`) is yours; machinery (`meta/`) is the system's. To upgrade the rulebook across many KBs later, copy one file.
+
+## Embedding in a host project
+
+The KB can also live as a subfolder (conventionally `kb/`) inside a larger project that feeds on it. Copy this whole folder in — it stays fully self-contained, `sources/` and `CLAUDE.md` included; nothing moves to the host. The host project's own `CLAUDE.md` needs only a short pointer block telling its agent the KB exists and how to use it: feed by dropping material into `kb/sources/` and asking to ingest, consume by querying, never edit `kb/content/` directly. The canonical block lives in `meta/host-snippet.md`; you don't have to remember it — the first-run setup interview detects an embedded install and offers to inject it into the host `CLAUDE.md`, and lint re-checks that it stays present and current.
 
 ## Later — point Claude Code at the same folder for Git
 

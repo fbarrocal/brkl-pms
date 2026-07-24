@@ -11,7 +11,7 @@ The health check that substitutes for the guarantees an external database would 
 
 ## Checks
 
-Run all of these across `content/` (and `sources/` for #8):
+Run all of these across `content/` (`sources/` for #8; the host project's `CLAUDE.md` for #14):
 
 1. **Missing or unregistered node types.** Any node with no `type` at all, or whose `type` is not in `SETTINGS.md` § Nodes. Propose registering it (via the setup skill) or reassigning it to an existing type.
 2. **Settings drift.** A registered type whose template in `meta/templates/` is missing, or whose fields disagree with its entry in `SETTINGS.md` § Nodes. Propose aligning them. Also flag orphan templates (a `meta/templates/<type>.md` with no matching entry in § Nodes), and flag if `setup_done` is `true` in `SETTINGS.md` but its Purpose or Language is still unset. Also flag content pages whose titles or prose are plainly not in the recorded Language — mixed-language vaults are a slow drift that only shows up once they are expensive to fix.
@@ -26,6 +26,7 @@ Run all of these across `content/` (and `sources/` for #8):
 11. **Provenance gaps.** Content pages with an empty or missing `sources:` field, `sources:` entries pointing at a file that isn't in `sources/`, and **broken round-trips** — a page listing a source that doesn't list it back in `touches:`, or vice versa. An unsourced page is the shape a fabricated one takes, so this check is worth running every pass.
 12. **Unstamped sources.** Files in `sources/` missing the source frontmatter block, and binaries with no `<filename>.md` sidecar. Propose stamping them (via ingest) so they can be processed.
 13. **One-sided symmetric edges.** For each predicate marked **(symmetric)** in `SETTINGS.md` § Edges, a page carrying it must appear in the same field on the page it points at. Report any that don't. This is the one check whose fix needs no judgment — the repair is always "mirror it" — so propose applying all of them in one go rather than asking page by page. It matters most for `contradicts`: an unmirrored conflict is invisible from the page being challenged.
+14. **Host pointer (embedded installs only).** If the KB folder is embedded inside a larger project (it is not the repository root, or a host `CLAUDE.md` exists above it), the host's `CLAUDE.md` should carry the `kb-host-snippet` marker block from `meta/host-snippet.md`. Flag a missing block, and a version-lagging one (marker `v` number older than the file in `meta/`). The fix — injecting or replacing the marked block, with confirmation — is the setup skill's embedded install check. Skip this check entirely when the KB is standalone.
 
 ## Report format
 
@@ -47,6 +48,7 @@ KB Lint — <date>
 11. Provenance (N): [[G]] has no `sources:` → which source built it?
 12. Unstamped sources (N): sources/report.pdf has no sidecar → stamp it?
 13. One-sided symmetric edges (N): [[H]] contradicts [[I]], not mirrored → mirror all?
+14. Host pointer: embedded install, host CLAUDE.md lacks kb-host-snippet → inject via setup?
 ```
 
 ## Applying fixes
