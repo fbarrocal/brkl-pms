@@ -1,6 +1,6 @@
 # Personal Management System template
 
-**v2.4.0** — the PMS (a knowledge graph with a task layer) with **Todoist as the task surface**. The PMS plans: it breaks goals into tasks, tracks what waits on what, and links work to what you know. Todoist is where you see, get reminded about, and tick off the tasks, on every device. The files own structure; Todoist owns execution state. Design record: `docs/adr/001-todoist-task-surface.md` in the template repository.
+**v2.5.0** — the PMS (a knowledge graph with a task layer) with **Todoist as the task surface**. The PMS plans: it breaks goals into tasks, tracks what waits on what, and links work to what you know. Todoist is where you see, get reminded about, and tick off the tasks, on every device. The files own structure; Todoist owns execution state. Design record: `docs/adr/001-todoist-task-surface.md` in the template repository.
 
 It needs the **Todoist connector** enabled in Claude; setup asks you to connect it. Without it, the knowledge side works and tasks queue up as *pending push*.
 
@@ -17,8 +17,10 @@ Then:
 1. **Rename & place this folder** to your PMS's name (e.g. `My-PMS`, `Work`, `Book-Notes`) and put it where you keep your files.
 2. **Enable file operations.** Claude Desktop → Settings → Capabilities → turn on **Code execution and file creation**.
 3. **Create the project starting FROM this folder.** Cowork tab → Projects → **New project → "Use an existing folder"** → select this folder. Start from the folder — don't create an empty project and try to attach the folder afterwards. Paste the blurb above into the project description/instructions. Keep **Memory on**.
-4. **Send your first message.** Because `setup_done` is `false`, the agent runs the setup skill: a short structured interview — purpose, node types, edges, language — whose answers it writes into `meta/SETTINGS.md` and `meta/GRAPH_SCHEMA.md`. **One exception:** if your first message is a task ("remind me to call Ana"), it captures the task first and offers setup after. You should never have to sit through an interview to write down one thing you need to do.
-   Setup starts by checking the **Todoist connector**. If it isn't authorized yet, it asks you to connect it (one PMS per Todoist account) and waits. It never asks for a password or token in chat. Near the end, it asks whether to **schedule the daily sync** (and an optional weekly lint) and creates the scheduled tasks if you say yes.
+4. **Send your first message.** Because `setup_done` is `false`, the agent runs the setup skill:
+   - **Connect Todoist.** It checks the Todoist connector first. If it isn't authorized yet, it asks you to connect it (one PMS per Todoist account) and waits. It never asks for a password or token in chat.
+   - **A short interview:** purpose, node types, edges, language, which Todoist projects are areas, and whether to **schedule the daily sync** (plus an optional weekly lint). It creates the scheduled tasks only if you say yes.
+   - **One exception:** if your first message is a task ("remind me to call Ana"), it captures the task first and offers setup after. That task reaches Todoist when setup finishes. You should never have to sit through an interview to write down one thing you need to do.
 5. **Then just use it.** Drop material in `raw/` and ask to ingest. Say "remind me to…" and it becomes a task. Ask questions of either.
 6. **Don't skip the sync schedule.** The sync is what moves completions from your phone into the PMS and unblocks the next steps. If you said "not now" during setup, say "schedule the sync" any time.
 
@@ -36,7 +38,7 @@ your-pms-folder/
 └── meta/                    # the machinery (visible on purpose)
     ├── GRAPH_INDEX.md       # navigation entry point — nodes + tasks, with aliases and statuses
     ├── GRAPH_SCHEMA.md      # the closed vocabulary: node types, task schema, edge predicates
-    ├── SETTINGS.md          # this PMS's purpose, language, conventions, setup state
+    ├── SETTINGS.md          # this PMS's purpose, language, conventions, Todoist policies, setup state
     ├── skills/              # setup / capture / plan / ingest / query / sync / lint — single source of truth
     └── templates/
         ├── _node.template.md   # generic seed — copy to meta/templates/<type>.md
@@ -45,7 +47,7 @@ your-pms-folder/
         └── project.md          # a project = one section in its area's Todoist project
 ```
 
-The split that matters: `CLAUDE.md` is static and identical across every PMS you build from it — the agent never edits it, and never writes outside this folder at all. Everything specific to THIS PMS lives in exactly two files, both under `meta/`: `GRAPH_SCHEMA.md` (what may exist) and `SETTINGS.md` (what this PMS is). Knowledge and work (`raw/`, `knowledge/`, `tasks/`) are yours; machinery (`meta/`) is the system's. To upgrade the rulebook across many systems later, copy one file.
+The split that matters: `CLAUDE.md` is static and identical across every PMS you build from it — the agent never edits it. Outside this folder, the agent writes only to Todoist (through the sync skill) and, at setup and on your yes, to the scheduled tasks. Everything that configures THIS PMS lives in exactly two files, both under `meta/`: `GRAPH_SCHEMA.md` (what may exist) and `SETTINGS.md` (what this PMS is). Knowledge and work (`raw/`, `knowledge/`, `tasks/`) are yours; machinery (`meta/`) is the system's. To upgrade the rulebook across many systems later, copy one file.
 
 ## How it works
 
@@ -53,7 +55,7 @@ The split that matters: `CLAUDE.md` is static and identical across every PMS you
 - **Nodes are typed.** Every page in the flat `knowledge/` folder has a `type:` (e.g. `entity`, `concept`, or a PMS-specific type like `person` or `character`). The frontmatter is the structured catalog layer; the prose body is the knowledge layer — both at once.
 - **`tasks/` is part of the graph, not a sidecar.** The folder split is about lifecycle — tasks complete, knowledge accretes — but a task carries the same typed edges and is traversed with the same scan. That's what makes "what's blocking Project X?" answerable: the tasks point at the project, and the query looks in both folders.
 - **Tasks reuse the same predicate vocabulary.** A subtask is `part_of`; a blocked task `depends_on`; a task's subject is `about`; an extracted action item is `introduced_by` its source. No task-specific predicates ship, and most PMS installs never need one.
-- **Capture is deliberately cheap.** Say "remind me to email Ana about Acme" and you get one file, one index line, one confirmation. It resolves links only against names already in the index — it will never invent an empty `[[Acme]]` page just because you mentioned it. Unrecognized mentions stay plain links, and lint offers to promote the ones that keep recurring.
+- **Capture is deliberately cheap.** Say "remind me to email Ana about Acme" and you get one file, one index line, the same task in Todoist, and a one-line confirmation. It resolves links only against names already in the index — it will never invent an empty `[[Acme]]` page just because you mentioned it. Unrecognized mentions stay plain links, and lint offers to promote the ones that keep recurring.
 - **Nothing is deleted.** A cancelled task is `status: dropped` with a reason, not a missing file. The record of deciding *not* to do something is worth keeping. Finished tasks get a `closed` date and, after a while, move to `tasks/archive/` — where they keep every edge but drop out of the index, so the index stays small enough to stay cheap.
 - **Provenance runs both ways.** Each node carries a `sources:` field listing the source items it was built from, and each source carries `touches:` listing the pages and tasks it fed. Lint checks the round-trip, so a page nothing supports is visible rather than plausible.
 - **Drop anything in `raw/`.** Files don't need to arrive tagged — ingest stamps the bookkeeping frontmatter it needs. Binaries (PDFs, images, audio) get a small `.md` sidecar that carries that frontmatter for them. Ingest also pulls action items out of meeting notes and transcripts, handing them to capture.
@@ -64,15 +66,15 @@ The split that matters: `CLAUDE.md` is static and identical across every PMS you
 
 | You say | It runs |
 |---|---|
-| "remind me to…", "add a task", "to do" | **capture** — one task file, linked to what it already knows |
+| "remind me to…", "add a task", "mark T-0042 done" | **capture** — one task file, linked to what it already knows, pushed to Todoist; also updates, completes or drops a task |
 | drop a file in `raw/`, "ingest this" | **ingest** — nodes, edges, and any action items it finds |
 | "what do I know about X", "what's blocking X", "what's open" | **query** — lookup, traversal, or task triage |
-| "add a node type", "novo edge" | **setup** — the only skill that edits the schema |
+| "add a node type", "novo edge", "connect Todoist", "schedule the sync" | **setup** — the only skill that edits the schema; also connects Todoist and schedules the sync |
 | "plan X", "break this down", "quebra em tarefas" | **plan** — proposes a task tree with dependencies, writes it on approval, and puts the whole tree in Todoist |
 | "sync", or the daily scheduled run | **sync** — pulls what you did on your phone, adopts tasks you added there, and unblocks what can now start |
 | "lint", "what's broken" | **lint** — 20 health checks in three cost tiers, including Todoist drift; proposes but never applies unasked |
 
-Each operation is owned by exactly one skill, and skills call each other rather than duplicating work: ingest calls capture for action items, lint routes its fixes back through the skill that owns them.
+Each operation is owned by exactly one skill, and skills call each other rather than duplicating work: ingest calls capture for action items, plan calls capture for its tree, every Todoist call goes through sync, and lint routes its fixes back through the skill that owns them.
 
 ## How to read the content
 
@@ -86,7 +88,7 @@ Everything is plain markdown, so any editor works. `meta/GRAPH_INDEX.md` is the 
 | Breadcrumbs | frontmatter fields you map as relation types in its settings |
 | Juggl | Dataview metadata |
 
-Dataview is also the easiest way to get a live task board without leaving Obsidian — `TABLE status, due FROM "tasks" WHERE status != "done"` gives you the same view the query skill produces in chat.
+Dataview can show a task board without leaving Obsidian: `TABLE status, due FROM "tasks" WHERE status != "done" AND status != "dropped"`. It reads the files, so it reflects Todoist only as of the last sync — Todoist itself is the live board.
 
 ### Obsidian
 
@@ -133,9 +135,11 @@ Both tools can share this folder safely: each keeps its session state in its own
 1. Copy in this template's `CLAUDE.md`, all of `meta/skills/`, and `meta/templates/` (including `area.md` and `project.md`).
 2. Merge `meta/GRAPH_SCHEMA.md`: add the `area` and `project` node types, the four-value `origin` enum, the task fields `deadline` and `todoist_id`, and the § Todoist mapping section. Keep your own types and predicates.
 3. Add the § Todoist section to `meta/SETTINGS.md`, and `todoist_synced_at:` to the index frontmatter.
-4. Say "configure o Todoist" to run setup's Todoist question, which binds your areas. Then say "sync — push all pending" so every existing open task goes to Todoist.
+4. Say "configure o Todoist": setup connects Todoist, binds your areas, and offers to schedule the sync. Then say "sync — push all pending" so every existing open task goes to Todoist.
+
+For anything older than v2.1, start from the README at tag `v2.1.0` in the template repository.
 
 ## Two things to know going in
 
-- **This is not local.** Running on Claude sends the *contents* of your notes to Anthropic. Your *files* stay on your disk. For a true air-gap, use a local-model GraphRAG tool instead.
+- **This is not local.** Running on Claude sends the *contents* of your notes to Anthropic, and your tasks (titles and short context) live in Todoist. Your *files* stay on your disk. For a true air-gap, use a local-model GraphRAG tool instead.
 - **It has a ceiling.** Comfortable to ~150–200 knowledge pages; past that, add an external indexed store. Tasks are cheaper, but archive the terminal ones. `CLAUDE.md` explains the design in full.

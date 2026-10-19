@@ -11,7 +11,8 @@ origin: capture               # capture | ingest | query | plan
 
 # --- optional: omit the line entirely rather than writing a placeholder ---
 # due: <YYYY-MM-DD>
-# deadline: <YYYY-MM-DD>       # pushed to Todoist only when SETTINGS § Todoist has deadlines: on
+# deadline: <YYYY-MM-DD>       # pushed to Todoist only when SETTINGS § Todoist has Deadlines `on`
+# priority: p4                 # p1 (highest) … p4 — as in Todoist, which owns it
 # todoist_id: ""              # written ONLY by the sync skill; absent = not pushed yet. A cache, not identity.
 # owner: ""                   # plain string, NOT a typed edge (see GRAPH_SCHEMA § Tasks)
 # tags: []
@@ -24,8 +25,8 @@ origin: capture               # capture | ingest | query | plan
 # Same vocabulary as knowledge nodes — tasks need no predicates of their own:
 #   about:       - "[[The Topic Or Project]]"     # what this task concerns
 #   part_of:     - "[[2026-08-10-parent-slug|The Parent Task]]"   # subtask — tasks are linked by file stem|title
-#   depends_on:  - "[[What It Waits On]]"         # pairs with status: blocked
-#   introduced_by: - "[[The Source Or Person]]"   # where it came from
+#   depends_on:  - "[[2026-08-09-other-slug|What It Waits On]]"   # usually another task; sync labels this pms-blocked
+#   introduced_by: - "[[The Person]]" or "[[<archived-source-stem>|<source title>]]"   # where it came from
 # Only exact title/alias matches from meta/GRAPH_INDEX.md become edges at capture time, written as
 # the index lists them: knowledge pages as [[Title]], tasks as [[file-stem|Title]].
 # An unrecognized name stays a plain [[wikilink]] in the body — never invent a stub node for it.

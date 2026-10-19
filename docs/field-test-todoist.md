@@ -1,16 +1,16 @@
-# Field test — Todoist side (v2.4.0)
+# Field test — Todoist side (v2.5.0)
 
-Run this after `field-test-v2.md` passes, on a scratch copy of `pms/`, with the Todoist connector enabled. It touches your real Todoist account, so use a throwaway area: bind a new project such as `PMS Test` during setup, not *Saúde* or *Gaming*. Archive that project at the end. Keep notes in `docs/test-notes/ft-v3.md`.
+Run this after `field-test-v2.md` passes, on a scratch copy of `pms/`, with the Todoist connector enabled. It touches a real Todoist account. Since one PMS owns one account, use a throwaway account if you can. Otherwise exclude every real project at Q5 and bind only a new `PMS Test` project, then archive it at the end. Keep notes in `docs/test-notes/ft-todoist.md`.
 
 | # | Do | Pass if | Tests |
 |---|---|---|---|
 | 0 | Start setup with the Todoist connector **disabled** | Setup's first move is to ask you to connect Todoist (a connector card or one line saying where), with no token asked in chat. After you enable it, it re-checks and continues. | Setup Step 0 |
-| 1 | Setup; Q5 offers every existing project as an area — keep only `PMS Test`; Q6: say yes to a daily sync | `area` node with `todoist_project_id`; other projects untouched; a scheduled task exists and `Sync schedule` is recorded in settings | Setup Q5, Q6 |
+| 1 | Setup; Q5 offers every existing project as an area and says how many tasks each would adopt — keep only `PMS Test` (give it one section and one task beforehand); Q6: say yes to a daily sync | `area` node with `todoist_project_id`; a `project` node for the existing section; other projects untouched; a scheduled task exists and `Sync schedule` is recorded; setup offers a first sync, which adopts the existing task | Setup Q5, Q6, close |
 | 2 | *"plan: organizar o check-up anual"* — approve a tree with one dependency | Section created in `PMS Test`; groups are **uncompletable** headers; the waiting step has `pms-blocked` and a `Waiting on:` line; every description ends `PMS: T-…`; task files have `todoist_id` | Plan → capture → sync push |
 | 3 | On the phone: try to tick a group header | It can't be completed | Uncompletable on mobile (ADR unproven #1) |
 | 4 | On the phone: complete the step the blocked one waits on; add a new task inside the section; rename another; add your own label `@casa` to one | — | — |
 | 5 | *"sync"* | Completion lands in the file with `closed`; the blocked step loses `pms-blocked` and is listed as **now unblocked**; the phone-added task is adopted (new T-id, footer pushed back); the rename updates the file and index; `@casa` **still present** | Pull, recompute, adoption, label merge |
-| 6 | Drop a task in chat (*"drop T-…, not needed"*) | Completed in Todoist with `pms-dropped`; file `dropped` with the reason | Drop mapping |
+| 6 | Drop a task in chat (*"drop T-…, not needed"*); then re-plan to drop a whole group | Completed in Todoist with `pms-dropped`; file `dropped` with the reason. For the group: the children are dropped first, and none of them comes back as `done` on the next sync | Drop mapping; bottom-up terminal order |
 | 7 | Delete a task on the phone, then sync | File becomes `dropped` with "deleted in Todoist"; no file removed | Deletion handling |
 | 8 | Move a task to another section on the phone, then sync | Sync asks; nothing changes until you answer | Moves are not adopted silently |
 | 9 | Turn wifi/connector off, capture a task, turn it back on, sync | Task captured offline, pushed on the next sync; lint #19 showed it as pending in between | Offline safety |

@@ -8,7 +8,7 @@ todoist_synced_at:     # set by the sync skill at the end of a completed run; em
 
 # Index
 
-Navigation entry point. Every query, ingest, and capture starts here — most of them read nothing else. Keep it current; lint checks it against the files actually on disk. Group node entries by type as the PMS grows.
+Navigation entry point. Every query, ingest, capture, plan and sync starts here — most of them read nothing else. Keep it current; lint checks it against the files actually on disk. Group node entries by type as the PMS grows.
 
 Each node entry carries the page's title **and its aliases**, so resolving a name — dedup on ingest, link resolution on capture, lookup on query — costs one read of this file instead of a scan of every page. Each task entry carries its id, its link, its status, and its due date, so task triage is answered without opening a single task file. The next task id is **not** derived from these entries — archiving removes them — but from `next_task_id` in the frontmatter above. An entry missing its aliases, or a task entry missing its due date, silently turns a one-read operation into a folder scan. Format:
 
@@ -22,7 +22,7 @@ Each node entry carries the page's title **and its aliases**, so resolving a nam
 A knowledge page's link is its title, because its filename is its title. A task's link is piped — file stem, then title — because task files are date-slugged and links resolve by filename. Copy the task link from here whenever you write an edge to a task.
 
 ## Nodes
-_(none yet — node pages appear here as you ingest, grouped by type)_
+_(none yet — node pages appear here as they are written by ingest, setup (areas) and plan (projects), grouped by type)_
 
 ## Tasks
 _(none yet — tasks appear here as you capture them; id, piped link, status, due if set)_

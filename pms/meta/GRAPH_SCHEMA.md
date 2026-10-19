@@ -2,22 +2,22 @@
 
 The **closed vocabulary** of this Personal Management System: which kinds of thing may exist, and which kinds of relationship may connect them. Every operation reads this file. Nothing outside these lists may be written — propose an addition here (via the setup skill) rather than inventing one.
 
-This is one of exactly two mutable **rules** files (the agent also maintains the index, templates, and content, but none of those define rules). The other is `meta/SETTINGS.md`, which holds this PMS's *state and configuration* (purpose, language, setup flag). The split is deliberate: this file is a vocabulary that grows and is diffed when it changes; the other is configuration, written once and rarely again. The static rules live in `CLAUDE.md` and are never edited.
+This is one of exactly two mutable **rules** files (the agent also maintains the index, templates, and content, but none of those define rules). The other is `meta/SETTINGS.md`, which holds this PMS's *state and configuration* (purpose, language, setup flag, Todoist policies). The split is deliberate: this file is a vocabulary that grows and is diffed when it changes; the other is configuration, written once and rarely again. The static rules live in `CLAUDE.md` and are never edited.
 
 ## Nodes
 
-Node types active in this PMS. Every page in `knowledge/` declares one in its `type:` field. Ships with two generic defaults; first-run setup adds PMS-specific ones. For each type: its name, what it represents, its fields, and its template file (if any).
+Node types active in this PMS. Every page in `knowledge/` declares one in its `type:` field. Ships with four: two generic defaults (`entity`, `concept`) and the two that structure work (`area`, `project`). First-run setup adds PMS-specific ones. For each type: its name, what it represents, its fields, and its template file (if any).
 
 - **`entity`** — a specific thing (a person, place, work, object, event). Fields: `title`, `aliases`, `tags`, typed-edge fields, `sources`, `see_also`. Template: none (follows the generic seed `meta/templates/_node.template.md` shape).
 - **`concept`** — an idea, theme, or topic. Fields: same as `entity`. Template: none (same seed shape).
 - **`area`** — a standing sphere of responsibility (health, a job, a hobby). Maps to a **Todoist project**. Fields: `title`, `aliases`, `tags`, `todoist_project_id`, typed-edge fields, `see_also`. Template: `meta/templates/area.md`. Areas are long-lived; finished work closes at the project level, not the area level.
-- **`project`** — a finite outcome with an end (move flat, launch X). Maps to a **section** of its area's Todoist project. Fields: `title`, `aliases`, `tags`, `todoist_section_id`, `part_of` (its area), typed-edge fields, `see_also`. Template: `meta/templates/project.md`.
+- **`project`** — a finite outcome with an end (move flat, launch X). Maps to a **section** of its area's Todoist project. Fields: `title`, `aliases`, `tags`, `todoist_section_id`, `part_of` (its area), optional `outcome`, typed-edge fields, `see_also`. Template: `meta/templates/project.md`.
 
-`area` and `project` ship with the template and are always present. They are the only knowledge nodes the plan skill writes, and they are exempt from the provenance requirement: they record an intent, not something learned from a source.
+`area` and `project` ship with the template and are always present. They are written by setup (binding existing Todoist projects and sections), by plan (new projects and areas), and by sync (sections created on the phone) — never by ingest from a source. That is why they are exempt from the provenance requirement: they record an intent, not something learned from a source.
 
 <!-- Add PMS-specific node types here during setup, e.g.:
 - `person` — a human relevant to this PMS. Fields: title, aliases, role, org, edges, sources, see_also. Template: meta/templates/person.md
-- `project` — a piece of work. Fields: title, status, edges, sources, see_also. Template: meta/templates/project.md
+- `meeting` — a meeting worth remembering. Fields: title, date, edges, sources, see_also. Template: meta/templates/meeting.md
 Each new type: (1) copy meta/templates/_node.template.md to meta/templates/<type>.md, (2) register it here. -->
 
 ## Tasks
@@ -29,7 +29,7 @@ Each new type: (1) copy meta/templates/_node.template.md to meta/templates/<type
 
 Unlike node types under **Nodes**, the task schema is **fixed** — it is not extended per PMS. Adding a field to it changes what every capture writes, so treat it as a rulebook-level change, not a setup-time one.
 
-**Fields.** `type` (always the literal `task`), `id`, `title`, `status`, `origin`, `created`, `updated` are required. `due`, `deadline`, `owner`, `tags`, `notes` are optional and omitted entirely when unknown — never filled with a placeholder. `todoist_id` is written only by the sync skill. Its absence means the task has not been pushed yet. `closed` is required **once and only once the status is terminal**. Template: `meta/templates/_task.template.md`.
+**Fields.** `type` (always the literal `task`), `id`, `title`, `status`, `origin`, `created`, `updated` are required. `due`, `deadline`, `priority` (`p1`–`p4`, as in Todoist), `owner`, `tags`, `notes` are optional and omitted entirely when unknown — never filled with a placeholder. `todoist_id` is written only by the sync skill. Its absence means the task has not been pushed yet. `closed` is required **once and only once the status is terminal**. Template: `meta/templates/_task.template.md`.
 
 `closed` exists because `updated` cannot answer "how long has this been done?" — `updated` bumps on any edit, so a task finished two months ago and touched yesterday looks fresh. Without a separate date, the archive window is unenforceable and lint's archivable check is guesswork. Set `closed` to the date the status became `done` or `dropped`; clear it if the task is ever reopened.
 
@@ -60,17 +60,21 @@ Fixed by the rulebook, like the task schema. The sync skill applies it.
 | `area` node | project (`todoist_project_id`) | files |
 | `project` node | section in its area's project (`todoist_section_id`) | files |
 | task `part_of` a project | task in that section | files (placement) |
+| task `part_of` an area, no project | task in the area's project, no section | files (placement) |
 | task `part_of` a task | subtask | files (placement) |
 | task with children, created by plan | **uncompletable** parent | files |
 | `depends_on` | `pms-blocked` label + `Waiting on:` description line | files (recomputed by sync) |
 | `status: done` / `closed` | completed / completion date | **Todoist** |
 | `status: dropped` | completed + `pms-dropped` label | files |
-| `status: doing` | not mirrored | files |
+| `status: open` / `doing` | active, no `pms-*` label (`doing` is not mirrored) | files |
 | `due` | due date | **Todoist** |
 | `deadline` | deadline (Pro only; see `meta/SETTINGS.md` § Todoist) | **Todoist** when enabled, else files |
 | `title` | content | **Todoist** after creation |
 | `id` | description footer `PMS: T-0042` | files |
-| other labels, priority, reminders | as in Todoist | **Todoist** (not copied into files, except priority) |
+| `priority` | priority | **Todoist** |
+| other labels, reminders | as in Todoist | **Todoist** (never copied into files) |
+
+"Owned by **Todoist**" means a pull overwrites the file with Todoist's value. A change the user makes in chat is written to the file and pushed at once, so it doesn't conflict.
 
 ## Edges
 

@@ -57,7 +57,7 @@ For "add a step", "this task is bigger than I thought", "move X after Y", "we're
 3. Apply it:
    - new tasks → capture batch (Mode A of capture);
    - changes to edges or status → capture Mode B;
-   - dropped work → `status: dropped` with a reason, never deleted.
+   - dropped work → `status: dropped` with a reason, never deleted. **Dropping a group means dropping every open child first**, then the group. In Todoist, completing a parent completes its open subtasks, and sync would then read those subtasks as *done* rather than dropped.
    Capture pushes each change through sync, so there is no separate push step here.
 4. **Splitting a task** that already exists: the original becomes the group (same id, same Todoist task, now uncompletable), and the new pieces are its children. Do not drop it and create a new one — that throws away its history and its Todoist id.
 

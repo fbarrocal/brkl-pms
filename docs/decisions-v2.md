@@ -75,3 +75,29 @@ See `field-test-v2.md` for the protocol that closes the first three.
 v2.2.0 introduced it as a separate variant. v2.3.0 moved connector authorization and sync scheduling into setup. v2.4.0 (Fernando's decision) made it the **only** template at `pms/`, so the files-only PMS survives only in git history (tag `v2.1.0`). Full record: `adr/001-todoist-task-surface.md`. In one line: the files own structure, Todoist owns execution state, the `PMS: T-0042` footer is the join key, `sync` is the only skill that touches Todoist, and `plan` is the new pipeline-manager skill. Field test: `field-test-todoist.md`.
 - **2026-10-19:** Mapping re-examined once the Free-plan cap stopped being a constraint. Fernando kept area → project / project → section; the costs he accepted and the triggers for revisiting are in ADR-001's amendment.
 - **2026-10-19:** Versioning fixed. kbcurator = v1.x (tag `v1.1.0`); everything PMS = v2.x. The earlier v3.0.0 / v3.1.0 tags were never pushed; they became v2.2.0 / v2.3.0. The Todoist edition became the only template in v2.4.0.
+
+## v2.5.0 (2026-10-19) — full-review hardening
+
+A file-by-file review of the template, then a second pass for system-level gaps. Contradictions fixed:
+
+- "Never writes outside this folder" was false once Todoist and scheduled tasks existed. It now names exactly those two exits.
+- Setup examples suggested registering a `project` type, which already ships.
+- Lint #14 said six sub-checks but had seven.
+- Lint #2 would have flagged `entity` and `concept` for having no template.
+- Lint #20's "foreign label damage" was uncheckable, because lint has no record of earlier labels. It is now a write-time guard in sync, and is listed under what lint cannot check.
+- Sync Mode 3 didn't cover the account read that setup depends on.
+- `priority` was synced but missing from the task schema.
+- A Pull read only the area projects, so completions of tasks pushed to the Inbox were never seen.
+
+Behaviour added:
+
+- No Todoist push before setup confirms the account; setup pushes those pending tasks when it finishes.
+- Placement falls back to an `about` edge pointing at a project or area.
+- A task that reaches an area but no project goes in the area's project with no section.
+- Terminal states are pushed bottom-up, and dropping a group drops its children first. Completing a Todoist parent cascades, so the wrong order would turn dropped children into `done`.
+- Groups close as `dropped` when every child was dropped.
+- Deletion is detected by fetching the task id, not inferred from absence.
+- Sections created on the phone are adopted as `project` nodes.
+- Setup Q5 states what binding implies (existing sections and tasks get adopted) and offers a first sync.
+- A chat edit to a Todoist-owned field (due date, title, priority) is pushed; Todoist's value wins only on a pull.
+- The index is re-read immediately before every write, because a scheduled sync and a chat session can run at once.

@@ -24,14 +24,16 @@ output/                  ← git root
 ├── docs/
 │   ├── adr/             ← architecture decision records (001: Todoist task surface)
 │   ├── decisions-v2.md  ← why v2 is shaped this way — read before structural changes
-│   ├── field-test-v2.md ← protocol for the first real run
+│   ├── field-test-v2.md ← first real run, core behaviours (Todoist off)
+│   ├── field-test-todoist.md ← first real run, Todoist side
+│   ├── link-format-check/ ← tiny Obsidian vault for the link-format check (test data, not a PMS)
 │   └── handover/        ← v1.0.1 design record (historical; 000_READ_FIRST maps v1→v2)
 └── pms/                 ← the template (v2.x): PMS with Todoist as the task surface — see docs/adr/001
 ```
 
 ## Invariants every change must preserve
 
-Files are the source of truth · each variant's `CLAUDE.md` stays static and identical across instances · `meta/GRAPH_SCHEMA.md` and `meta/SETTINGS.md` are the only mutable rules files · node types and predicates are a closed per-PMS vocabulary · nothing silently fabricates data or hard-deletes.
+Files are the source of truth for knowledge and structure, Todoist for execution state (ADR-001) · each variant's `CLAUDE.md` stays static and identical across instances · `meta/GRAPH_SCHEMA.md` and `meta/SETTINGS.md` are the only mutable rules files · node types and predicates are a closed per-PMS vocabulary · nothing silently fabricates data or hard-deletes — in the files or in Todoist · outside its folder, a PMS writes only to Todoist (through sync) and to scheduled tasks (at setup, on a yes).
 
 ## Working conventions
 
