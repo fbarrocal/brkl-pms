@@ -66,6 +66,22 @@ Existing account content: Inbox (9 old items), projects *Saúde*, *Gaming*, *Vid
 - **Recurring tasks are out of scope.** A recurring task never reaches "done", so it can't carry graph state. Sync leaves them alone and lists them once.
 - **The Inbox is not auto-adopted.** Tasks added on the phone inside a managed section are adopted automatically. Inbox items are offered for triage, because the Inbox holds years of unrelated items.
 
+## Amendment — 2026-10-19: deployment model
+
+**One PMS instance per Todoist account.** Plan limits are the account owner's to lift (upgrade), not a design constraint. Consequences applied in the variant:
+
+- **Connector authorization moved into setup** (Step 0, before the interview). The probe goes through sync. Credentials are never requested in chat. If the user declines, the knowledge side still works and tasks wait as pending push.
+- **Every existing Todoist project is offered as an area by default.** It is the user's account, so opt-out replaces opt-in.
+- **Scheduling the daily sync is a setup question (Q6),** created only on a yes.
+- **The Free-plan cap check is removed** from sync and lint. A plan-limit refusal is reported, with an upgrade suggestion, and never worked around.
+
+**Open question this reopens:** the area → project / project → section mapping was justified partly by the 5-project cap, and that justification no longer holds. The mapping still has independent merits: a short, stable Todoist sidebar and one place per area. But the alternative — **PMS project → Todoist project (sub-project of its area), phases → sections** — now competes on merit:
+- sections give phases a native group that can't be ticked, so far fewer uncompletable headers;
+- Todoist shares and archives per project, so a project can be shared with a collaborator or archived when finished;
+- board view per project shows phases as columns;
+- the cost is more projects and sidebar churn, and nested projects to manage.
+Pending Fernando's decision; the variant ships the original mapping until then.
+
 ## Unproven (field test before relying on it)
 
 - Uncompletable parents behave as headers on mobile and block accidental completion. [Likely, not yet tested]

@@ -57,8 +57,7 @@ If a pass is running long, **stop and report what you have**, naming the checks 
     - **Pending push.** Task files with no `todoist_id`. A few right after an offline capture is normal; anything older than a day means sync isn't running. Fix: sync Mode 1, "all pending".
     - **Duplicate `todoist_id`.** Two files claiming one Todoist task — always a bug, usually from an interrupted push. Report both files; never pick one silently.
     - **Unbound structure.** An `area` with no `todoist_project_id`, or a `project` with no `todoist_section_id` but with pushed tasks under it.
-    - **Area count over the plan.** More `area` nodes than `meta/SETTINGS.md` § Todoist allows Todoist projects.
-    - **Stale sync.** `todoist_synced_at` empty while pushed tasks exist, or older than the warning age in settings.
+    - **Stale sync.** `todoist_synced_at` empty while pushed tasks exist, or older than the warning age in settings. Also report `Sync schedule: not scheduled` once, with the offer to run setup Q6.
     - **Stale display text.** A task link whose text after `|` no longer matches the target's title in the index (the title was edited in Todoist). Housekeeping only — the link still resolves.
 
 ### Pass B — the graph itself
@@ -93,7 +92,7 @@ These two read material rather than metadata. They are the only checks that can 
 **Order by severity, not by check number.** A report that opens with rare structural nits and buries an unsupported claim on line 40 trains the user to skim it, and a skimmed health check is a decorative one. Three bands, always in this order, and omit any band that is empty:
 
 - **Broken** — produces wrong answers right now: #18, #20's foreign label damage, #16, #5, #13, #15, #14's invalid-enum, stale-block and counter-behind, #19's duplicate `todoist_id`, #20's state disagreement, #3, #7.
-- **Drifting** — will produce wrong answers soon: #9, #11, #2, #1, #12, #8, #14's `closed` mismatch, #17, #19's pending push, unbound structure, area count and stale sync, #20's orphans.
+- **Drifting** — will produce wrong answers soon: #9, #11, #2, #1, #12, #8, #14's `closed` mismatch, #17, #19's pending push, unbound structure and stale sync, #20's orphans.
 - **Housekeeping** — taste and volume: #4, #6, #10, #14's archivable, #19's stale display text.
 
 ```

@@ -10,7 +10,7 @@ Node types active in this PMS. Every page in `knowledge/` declares one in its `t
 
 - **`entity`** — a specific thing (a person, place, work, object, event). Fields: `title`, `aliases`, `tags`, typed-edge fields, `sources`, `see_also`. Template: none (follows the generic seed `meta/templates/_node.template.md` shape).
 - **`concept`** — an idea, theme, or topic. Fields: same as `entity`. Template: none (same seed shape).
-- **`area`** — a standing sphere of responsibility (health, a job, a hobby). Maps to a **Todoist project**. Fields: `title`, `aliases`, `tags`, `todoist_project_id`, typed-edge fields, `see_also`. Template: `meta/templates/area.md`. Keep areas few and long-lived: Todoist Free allows five active projects.
+- **`area`** — a standing sphere of responsibility (health, a job, a hobby). Maps to a **Todoist project**. Fields: `title`, `aliases`, `tags`, `todoist_project_id`, typed-edge fields, `see_also`. Template: `meta/templates/area.md`. Areas are long-lived; finished work closes at the project level, not the area level.
 - **`project`** — a finite outcome with an end (move flat, launch X). Maps to a **section** of its area's Todoist project. Fields: `title`, `aliases`, `tags`, `todoist_section_id`, `part_of` (its area), typed-edge fields, `see_also`. Template: `meta/templates/project.md`.
 
 `area` and `project` ship with this variant and are always present. They are the only knowledge nodes the plan skill writes, and they are exempt from the provenance requirement: they record an intent, not something learned from a source.

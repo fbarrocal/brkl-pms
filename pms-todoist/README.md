@@ -1,6 +1,6 @@
 # Personal Management System template — Todoist edition
 
-**v3.0.0** — the PMS (a knowledge graph with a task layer) with **Todoist as the task surface**. The PMS plans: it breaks goals into tasks, tracks what waits on what, and links work to what you know. Todoist is where you see, get reminded about, and tick off the tasks, on every device. The files own structure; Todoist owns execution state. Design record: `docs/adr/001-todoist-task-surface.md` in the template repository.
+**v3.1.0** — the PMS (a knowledge graph with a task layer) with **Todoist as the task surface**. The PMS plans: it breaks goals into tasks, tracks what waits on what, and links work to what you know. Todoist is where you see, get reminded about, and tick off the tasks, on every device. The files own structure; Todoist owns execution state. Design record: `docs/adr/001-todoist-task-surface.md` in the template repository.
 
 This edition needs the **Todoist connector** enabled in Claude. Without it, the knowledge side works and tasks queue up as *pending push*.
 
@@ -18,10 +18,9 @@ Then:
 2. **Enable file operations.** Claude Desktop → Settings → Capabilities → turn on **Code execution and file creation**.
 3. **Create the project starting FROM this folder.** Cowork tab → Projects → **New project → "Use an existing folder"** → select this folder. Start from the folder — don't create an empty project and try to attach the folder afterwards. Paste the blurb above into the project description/instructions. Keep **Memory on**.
 4. **Send your first message.** Because `setup_done` is `false`, the agent runs the setup skill: a short structured interview — purpose, node types, edges, language — whose answers it writes into `meta/SETTINGS.md` and `meta/GRAPH_SCHEMA.md`. **One exception:** if your first message is a task ("remind me to call Ana"), it captures the task first and offers setup after. You should never have to sit through an interview to write down one thing you need to do.
+   Setup starts by checking the **Todoist connector**. If it isn't authorized yet, it asks you to connect it (one PMS per Todoist account) and waits. It never asks for a password or token in chat. Near the end, it asks whether to **schedule the daily sync** (and an optional weekly lint) and creates the scheduled tasks if you say yes.
 5. **Then just use it.** Drop material in `raw/` and ask to ingest. Say "remind me to…" and it becomes a task. Ask questions of either.
-6. **Connect Todoist.** In Claude's connector settings, enable **Todoist** for this project. During setup you choose which of your Todoist projects are *areas* of this PMS. The rest stay untouched.
-7. **Schedule the sync — this is not optional.** Add a scheduled task to the project, daily, e.g. *"todo dia às 7h, rode o sync do Todoist e me mostre o que destravou."* The sync is what moves completions from your phone into the PMS and unblocks the next steps. On Todoist Free, activity history lasts one week, so never let it lapse longer than that.
-8. **(Optional) Weekly lint.** *"toda segunda, rode o lint rápido (Pass A)."* Schedule the quick pass only; the deeper ones are worth asking for deliberately.
+6. **Don't skip the sync schedule.** The sync is what moves completions from your phone into the PMS and unblocks the next steps. If you said "not now" during setup, say "schedule the sync" any time.
 
 ## Layout
 
@@ -127,7 +126,7 @@ Both tools can share this folder safely: each keeps its session state in its own
 **What to do in the PMS instead:** restructure — move a task to another project, change what waits on what, drop a task with a reason. If you move a task on the phone, sync asks you rather than guessing.
 **The Inbox is yours.** Sync never adopts Inbox items on its own; it offers the newest ones for triage.
 
-**Plan limits (Todoist Free):** 5 active projects, so keep areas few. 20 sections per project means 20 live projects per area. No deadlines (the PMS keeps `deadline` in the file and shows it in the task description). Activity history lasts one week, which is why the daily sync matters.
+**One PMS per Todoist account.** Setup offers every existing Todoist project as an area; exclude the ones you want left alone. **Plan limits are yours to lift:** on Todoist Free (5 active projects, no deadlines, one week of activity history), the PMS tells you when a limit blocks something and suggests upgrading. It doesn't work around it. On Free, `deadline` stays in the file and appears in the task description.
 
 ## Upgrading from the plain `pms/` edition (v2.1.x)
 

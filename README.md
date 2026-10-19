@@ -7,7 +7,7 @@ output/
 ├── CLAUDE.md     ← builder rules: variants are artifacts, not instructions
 ├── docs/         ← design record (decisions, ADRs, field-test protocol, v1 handover)
 ├── pms/          ← plain template, v2.1.0 — tasks live only in files
-└── pms-todoist/  ← v3.0.0 — same PMS, Todoist as the task surface (ADR-001)
+└── pms-todoist/  ← v3.1.0 — same PMS, Todoist as the task surface (ADR-001)
 ```
 
 **To use one:** copy the variant folder out, rename it to whatever the system is for, and follow its own `README.md`. It has no dependency on this repository or on any sibling.

@@ -10,7 +10,7 @@ The bridge between the files and Todoist. **This skill is authoritative for ever
 
 **Prerequisite:** `CLAUDE.md` — operate by it. `meta/GRAPH_SCHEMA.md` § Tasks and § Todoist mapping are the authority for which field goes where. `meta/SETTINGS.md` § Todoist holds this PMS's bindings and policies.
 
-**If Todoist is unreachable** (connector missing or failing), stop before writing anything, say so in one line, and leave every file as it is. Tasks without a `todoist_id` simply stay pending and the next run pushes them. Never fake a sync result.
+**If Todoist is unreachable** (connector missing, not authorized, or failing), stop before writing anything, say so in one line, and leave every file as it is. If the connector was never connected or has lost its authorization, offer to run setup's Step 0 (connect Todoist). Tasks without a `todoist_id` simply stay pending and the next run pushes them. Never fake a sync result.
 
 ## Rules that apply in every mode
 
@@ -28,7 +28,7 @@ The bridge between the files and Todoist. **This skill is authoritative for ever
 Input: one or more task ids whose files changed, or "all pending" (every task file with no `todoist_id`).
 
 1. **Resolve placement from the graph, not from the user's words.** Walk the task's `part_of` edges up to the nearest `project` node and that project's `area`. The area's `todoist_project_id` is the Todoist project; the project's `todoist_section_id` is the section. A task `part_of` another task becomes a subtask of that task's `todoist_id`. A task with no project and no area goes to the project named in `meta/SETTINGS.md` § Todoist `unplaced` (default: Inbox).
-   - If the area or project has no Todoist binding yet, create it first (project for an area, section for a project), write the new id into that node's frontmatter, and include it in the report. Before creating a project, check the Free-plan cap in `meta/SETTINGS.md` § Todoist; if it would be exceeded, stop and ask.
+   - If the area or project has no Todoist binding yet, create it first (project for an area, section for a project), write the new id into that node's frontmatter, and include it in the report. If Todoist refuses the creation because of a plan limit, stop, report the limit, and suggest upgrading. Never work around it by putting the tasks somewhere else.
 2. **Parents before children.** Push in tree order so every `parentId` exists before its subtasks are sent.
 3. **Create or update.**
    - No `todoist_id` → search for the footer first (an earlier run may have created it and then stopped). Found → adopt that id. Not found → create.

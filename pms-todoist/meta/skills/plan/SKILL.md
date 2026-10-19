@@ -36,7 +36,7 @@ Open questions: <anything you had to assume>
 
    Ask for approval, edits, or a different cut. Iterate until approved. **Do not write a partial plan** while the user is still deciding.
 5. **On approval, write the structure:**
-   - **Project node.** If none exists, create `knowledge/<Project>.md` from `meta/templates/project.md`, with `part_of: ["[[<Area>]]"]`. The same goes for a new area (`meta/templates/area.md`); ask first, because a new area becomes a new Todoist project and the Free plan caps those (see `meta/SETTINGS.md` § Todoist). These two node types are the only knowledge pages this skill writes. They are exempt from the provenance check because they record an intent, not a source. Add each one to the index.
+   - **Project node.** If none exists, create `knowledge/<Project>.md` from `meta/templates/project.md`, with `part_of: ["[[<Area>]]"]`. The same goes for a new area (`meta/templates/area.md`); ask first, because a new area becomes a new Todoist project. These two node types are the only knowledge pages this skill writes. They are exempt from the provenance check because they record an intent, not a source. Add each one to the index.
    - **Tasks.** Call capture **once, as a batch**, with every node of the tree in order (parents first):
      - the title;
      - `origin: plan`;

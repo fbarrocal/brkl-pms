@@ -4,7 +4,8 @@ Run this after `field-test-v2.md` passes, on a scratch copy of `pms-todoist/`, w
 
 | # | Do | Pass if | Tests |
 |---|---|---|---|
-| 1 | Setup; bind only `PMS Test` as an area | `area` node with `todoist_project_id`; other Todoist projects untouched | Setup Q5 |
+| 0 | Start setup with the Todoist connector **disabled** | Setup's first move is to ask you to connect Todoist (a connector card or one line saying where), with no token asked in chat. After you enable it, it re-checks and continues. | Setup Step 0 |
+| 1 | Setup; Q5 offers every existing project as an area — keep only `PMS Test`; Q6: say yes to a daily sync | `area` node with `todoist_project_id`; other projects untouched; a scheduled task exists and `Sync schedule` is recorded in settings | Setup Q5, Q6 |
 | 2 | *"plan: organizar o check-up anual"* — approve a tree with one dependency | Section created in `PMS Test`; groups are **uncompletable** headers; the waiting step has `pms-blocked` and a `Waiting on:` line; every description ends `PMS: T-…`; task files have `todoist_id` | Plan → capture → sync push |
 | 3 | On the phone: try to tick a group header | It can't be completed | Uncompletable on mobile (ADR unproven #1) |
 | 4 | On the phone: complete the step the blocked one waits on; add a new task inside the section; rename another; add your own label `@casa` to one | — | — |

@@ -29,9 +29,10 @@ Operating preferences for this PMS. Defaults shown; setup or the user may change
 
 Bindings and policies for the task surface. Setup writes these; the sync skill reads them.
 
-- **Plan:** `free` — on `free`, keep at most **5** active Todoist projects, which means at most 5 areas plus any unmanaged projects you already have. Change to `pro` if the account is upgraded.
-- **Deadlines:** `off` — Todoist deadlines are Pro-only. While `off`, a task's `deadline` stays in the file and is shown in its description instead.
+- **Connection:** _(unset — setup Step 0 records `connected (<account>)` or `not connected`)_. One PMS per Todoist account.
+- **Plan:** _(unset — read from the account at setup: `free` or `pro`)_. Plan limits — on Free: 5 active projects, no deadlines, one week of activity history — belong to the account owner. When Todoist refuses something for a plan limit, sync reports it and suggests upgrading. It never works around the limit by placing tasks somewhere else.
+- **Deadlines:** `off` on Free, `on` on Pro. While `off`, a task's `deadline` stays in the file and is shown in its description instead.
 - **Unplaced tasks go to:** `inbox` — where a task with no project and no area is pushed.
 - **Adopt from the Inbox:** `no` — Inbox items without a `PMS:` footer are offered for triage, never adopted automatically. Tasks added on the phone *inside a managed section or project* are always adopted.
 - **Labels:** `pms-blocked`, `pms-dropped` — the only labels sync adds or removes. Every other label is the user's.
-- **Sync cadence:** daily, as a Cowork scheduled task. Warn if the last sync is older than **6 days** — Todoist Free keeps one week of activity history.
+- **Sync schedule:** _(unset — setup Q6 records e.g. `daily 07:00 America/Sao_Paulo`, `weekly lint Mon`, or `not scheduled`)_. Whatever the schedule, warn if the last sync is older than **6 days**: Todoist Free keeps one week of activity history.
