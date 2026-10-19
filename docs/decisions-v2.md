@@ -69,3 +69,7 @@ Spec defects found in an evaluation pass; none required new field evidence becau
 - Nothing verifies `CLAUDE.md` / `meta/skills/` were not edited. Git is the current answer; a hash marker checked by a validator is the proposed one.
 
 See `field-test-v2.md` for the protocol that closes the first three.
+
+## v3.0.0 (2026-10-19) — Todoist edition
+
+A separate variant, `pms-todoist/`, not a change to `pms/`. Full record: `adr/001-todoist-task-surface.md`. In one line: the files own structure, Todoist owns execution state, the `PMS: T-0042` footer is the join key, `sync` is the only skill that touches Todoist, and `plan` is the new pipeline-manager skill. Field test: `field-test-v3-todoist.md`.
