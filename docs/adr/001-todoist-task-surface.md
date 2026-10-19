@@ -75,12 +75,22 @@ Existing account content: Inbox (9 old items), projects *Saúde*, *Gaming*, *Vid
 - **Scheduling the daily sync is a setup question (Q6),** created only on a yes.
 - **The Free-plan cap check is removed** from sync and lint. A plan-limit refusal is reported, with an upgrade suggestion, and never worked around.
 
-**Open question this reopens:** the area → project / project → section mapping was justified partly by the 5-project cap, and that justification no longer holds. The mapping still has independent merits: a short, stable Todoist sidebar and one place per area. But the alternative — **PMS project → Todoist project (sub-project of its area), phases → sections** — now competes on merit:
+**Question this reopened (now closed — see below):** the area → project / project → section mapping was justified partly by the 5-project cap, and that justification no longer holds. The mapping still has independent merits: a short, stable Todoist sidebar and one place per area. But the alternative — **PMS project → Todoist project (sub-project of its area), phases → sections** — now competes on merit:
 - sections give phases a native group that can't be ticked, so far fewer uncompletable headers;
 - Todoist shares and archives per project, so a project can be shared with a collaborator or archived when finished;
 - board view per project shows phases as columns;
 - the cost is more projects and sidebar churn, and nested projects to manage.
-Pending Fernando's decision; the variant ships the original mapping until then.
+**Decided 2026-10-19 (Fernando): keep the original mapping — area → Todoist project, project → section, phase → parent task that can't be ticked.** This time it is chosen on its merits: a short, stable sidebar, and good handling of small projects.
+
+Costs accepted with it:
+- **Phases rely on a workaround.** A phase is a parent task that can't be ticked, and only `plan` creates those. A parent you create yourself on the phone can still be ticked, and ticking it completes every step under it. Sync then records all of those steps as done.
+- **A project can't be shared, archived or shown as a board on its own.** A finished project's section stays in its area. Sync offers to archive it rather than doing it, because the connector has no tool to archive a section — so far it has only been seen to update sections.
+
+**Revisit triggers:**
+- the first time a project has to be shared with someone;
+- areas carrying more than about 10 live sections;
+- phase-heavy plans producing many headers that can't be ticked.
+If any of these happens, switch a project to its own Todoist project with phases as sections.
 
 ## Unproven (field test before relying on it)
 
