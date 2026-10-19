@@ -4,7 +4,9 @@ This repository holds **variants** of a portable Personal Management System temp
 
 ```
 output/
-└── pms/          ← the current template, v2.0.0
+├── CLAUDE.md     ← builder rules: variants are artifacts, not instructions
+├── docs/         ← design record (decisions, field-test protocol, v1 handover)
+└── pms/          ← the current template, v2.1.0
 ```
 
 **To use one:** copy the variant folder out, rename it to whatever the system is for, and follow its own `README.md`. It has no dependency on this repository or on any sibling.
@@ -19,5 +21,6 @@ Every variant's `CLAUDE.md` is written as an operating manual for a *running* sy
 
 ## Where the reasoning lives
 
-- `../handover-docs/` — the design record. Docs `01`–`07` describe **v1.0.1** and are historical; `000_READ_FIRST.md` carries a v1→v2 mapping table and says what has been superseded.
-- The v2 decision log — why the task layer, the two-file schema split, and the closed enums are shaped the way they are — is in project memory, not in this repo.
+- `docs/decisions-v2.md` — why v2 is shaped the way it is: the task layer, the two-file schema split, closed enums, the lint passes, and the v2.1.0 stabilization fixes. Read it before proposing a structural change.
+- `docs/field-test-v2.md` — the protocol for the first real run of v2.
+- `docs/handover/` — the v1.0.1 design record. Docs `01`–`07` are historical; `000_READ_FIRST.md` carries a v1→v2 mapping table and says what has been superseded.
