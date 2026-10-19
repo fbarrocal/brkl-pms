@@ -1,6 +1,6 @@
-# Field test — pms-todoist v3.0.0
+# Field test — Todoist side (v2.4.0)
 
-Run this after `field-test-v2.md` passes, on a scratch copy of `pms-todoist/`, with the Todoist connector enabled. It touches your real Todoist account, so use a throwaway area: bind a new project such as `PMS Test` during setup, not *Saúde* or *Gaming*. Archive that project at the end. Keep notes in `docs/test-notes/ft-v3.md`.
+Run this after `field-test-v2.md` passes, on a scratch copy of `pms/`, with the Todoist connector enabled. It touches your real Todoist account, so use a throwaway area: bind a new project such as `PMS Test` during setup, not *Saúde* or *Gaming*. Archive that project at the end. Keep notes in `docs/test-notes/ft-v3.md`.
 
 | # | Do | Pass if | Tests |
 |---|---|---|---|

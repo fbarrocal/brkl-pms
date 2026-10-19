@@ -4,6 +4,8 @@
 
 A self-contained, file-based **Personal Management System**: a knowledge graph and a task layer in one set of files. The markdown files are the source of truth: no separate graph database, no embeddings, no required plugin. Relationships are stored as typed frontmatter fields — each a field named for the predicate, holding a list of `"[[wikilinks]]"`. Retrieval is navigation, not vector search. The canonical knowledge is in the files (`raw/` + `knowledge/` + `tasks/`), never in any tool's memory — which is what makes it safe to alternate between Cowork and Claude Code on the same folder.
 
+**Tasks also live in Todoist, which is where the user sees and ticks them off.** Ownership is split by field: **the files own structure** — how work breaks down, what waits on what, what a task is about, where it is placed, and whether it was dropped. **Todoist owns execution state** — done or not, due date, priority, reminders, and the title as last edited. The files are the source of truth for knowledge and structure; Todoist is the source of truth for execution state. See **Todoist** below.
+
 This file (`CLAUDE.md`) is the **static rulebook** — identical across every Personal Management System built from it; the agent never edits it. Everything specific to THIS PMS lives in two files under `meta/`, and only those two: **`meta/GRAPH_SCHEMA.md`** (the closed vocabulary — node types, task schema, edge predicates) and **`meta/SETTINGS.md`** (state and configuration — purpose, language, setup flag). Comfortable scale is ~150–200 knowledge pages / ~50–100k tokens; past that, recommend an external indexed store (lint warns as it approaches). Tasks are cheaper but not free — archive terminal ones.
 
 ## Role
@@ -25,15 +27,19 @@ Act as this Personal Management System's manager and curator: you author and mai
 
 | Operation | Trigger (examples) | Procedure |
 |---|---|---|
-| Setup | `setup_done` false or `meta/SETTINGS.md` missing; "configure o PMS", "configure o KB", "novo tipo de node", "novo edge" | `meta/skills/setup/SKILL.md` |
+| Setup | `setup_done` false or `meta/SETTINGS.md` missing; "configure o PMS", "configure o KB", "configure o Todoist", "novo tipo de node", "novo edge" | `meta/skills/setup/SKILL.md` |
 | Capture | "to do", "todo", "remember me to", "add a task", "action item", "lembra de", "preciso" | `meta/skills/capture/SKILL.md` |
 | Ingest | file dropped in `raw/`; "ingest", "add this to my PMS", "processe esta nota", "adicione ao KM" | `meta/skills/ingest/SKILL.md` |
 | Query | "o que eu sei sobre X?", "como X se conecta a Y?", "what's on my plate", "o que está aberto", any lookup, traversal, or task list | `meta/skills/query/SKILL.md` |
 | Lint | "lint", "revise o KM", "o que está quebrado"; "full lint", "is any of this made up" | `meta/skills/lint/SKILL.md` |
+| Plan | "plan", "break this down", "quebra em tarefas", "planeja", "what are the steps to…", re-plan an existing project | `meta/skills/plan/SKILL.md` |
+| Sync | "sync", "sincroniza", "what did I finish on my phone", the scheduled daily run; any other skill needing Todoist | `meta/skills/sync/SKILL.md` |
+
+**Plan vs. capture.** One thing to do is capture. A goal that needs several steps — "plan the move", "break this down", "what are the steps to…" — is plan. When unsure, capture it and offer to plan it.
 
 **Routing precedence.** Capture and ingest both react to "add this" — they are told apart by *what* is being added, not by the verb. An **imperative aimed at the user's future self** ("remember to email Ana") is capture. **Material to be understood** — a file, an article, a transcript, pasted text — is ingest. When a request is genuinely both ("here's the meeting transcript, and remind me to follow up"), run ingest, which will call capture for the action items. When it is genuinely ambiguous, ask; do not guess and do not run both independently.
 
-**Skill composition.** Exactly one skill is authoritative for each workflow, and a skill may **invoke** another rather than reimplementing it: ingest calls capture for action items; capture and lint call setup for schema changes; query calls capture when the user turns an answer into a task. A skill never duplicates another's procedure — if you find yourself writing a task file from inside ingest, stop and follow `meta/skills/capture/SKILL.md` instead. The invoked skill owns its output format and its rules; the caller owns the decision to invoke.
+**Skill composition.** Exactly one skill is authoritative for each workflow, and a skill may **invoke** another rather than reimplementing it: ingest calls capture for action items; capture and lint call setup for schema changes; query calls capture when the user turns an answer into a task; plan calls capture to write the tasks it designed. **Every call to Todoist goes through sync** — capture and plan call it to push, query calls it to read, lint routes Todoist fixes through it. No other skill talks to Todoist. A skill never duplicates another's procedure — if you find yourself writing a task file from inside ingest, stop and follow `meta/skills/capture/SKILL.md` instead. The invoked skill owns its output format and its rules; the caller owns the decision to invoke.
 
 # How it works
 
@@ -85,6 +91,17 @@ A task is a node that carries state. It lives in `tasks/`, carries typed edges l
 **Tasks are never deleted.** An abandoned task is `status: dropped` with a reason in `notes` — the record of a decision not to do something is worth as much as the record of doing it. Terminal tasks (`done`, `dropped`) carry a `closed:` date and may be moved to `tasks/archive/` once that date is older than the window in `meta/SETTINGS.md`; lint proposes the move, and nothing is archived automatically. Archiving **removes the task's index entry** — the file keeps its edges and its id forever, but the index stays bounded, which is what makes it cheap enough to read on every operation.
 
 **Linking happens at runtime, cheaply.** Capture resolves only what one read of `meta/GRAPH_INDEX.md` can resolve — exact title and alias matches become typed edges. It **never creates stub nodes** for names it doesn't recognize; an unresolved mention stays a plain prose `[[wikilink]]`, which lint's untyped-link check will later offer to promote. This keeps capture fast enough to be worth using, and it keeps the graph free of empty pages invented by a one-line reminder.
+
+## Todoist
+
+The task surface. Everything here is enforced by the sync skill; the full mapping is in `meta/GRAPH_SCHEMA.md` § Todoist mapping.
+
+- **Areas and projects.** An `area` node maps to a Todoist **project**; a `project` node (`part_of` an area) maps to a **section** in that area's project; tasks map to tasks in the section; `part_of` another task maps to a subtask. The bindings (`todoist_project_id`, `todoist_section_id`) live in those nodes' frontmatter.
+- **The join key is the task id, not Todoist's.** Every managed Todoist task ends its description with `PMS: T-0042`. The file's `todoist_id` is a cache, refreshed when it stops resolving. Todoist has reissued every id before (its 2025 API migration), so identity must not depend on it.
+- **Dependencies are the PMS's job.** Todoist has none. A task waiting on another carries the `pms-blocked` label and a `Waiting on:` line. Sync removes both when every `depends_on` target is finished. That recompute is the pipeline: it is what makes the next step appear.
+- **Grouping tasks are uncompletable headers in Todoist**, because completing a Todoist parent completes all its open subtasks. The PMS closes a group when its children are all terminal.
+- **Never delete in Todoist.** `dropped` is completed + `pms-dropped`. A task deleted on the phone becomes `dropped` in the files, never a missing file.
+- **Offline is safe.** Without Todoist reachable, capture still writes the file; a task with no `todoist_id` is simply *pending push*, and the next sync sends it.
 
 ## Sources
 

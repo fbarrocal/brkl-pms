@@ -10,6 +10,10 @@ Node types active in this PMS. Every page in `knowledge/` declares one in its `t
 
 - **`entity`** — a specific thing (a person, place, work, object, event). Fields: `title`, `aliases`, `tags`, typed-edge fields, `sources`, `see_also`. Template: none (follows the generic seed `meta/templates/_node.template.md` shape).
 - **`concept`** — an idea, theme, or topic. Fields: same as `entity`. Template: none (same seed shape).
+- **`area`** — a standing sphere of responsibility (health, a job, a hobby). Maps to a **Todoist project**. Fields: `title`, `aliases`, `tags`, `todoist_project_id`, typed-edge fields, `see_also`. Template: `meta/templates/area.md`. Areas are long-lived; finished work closes at the project level, not the area level.
+- **`project`** — a finite outcome with an end (move flat, launch X). Maps to a **section** of its area's Todoist project. Fields: `title`, `aliases`, `tags`, `todoist_section_id`, `part_of` (its area), typed-edge fields, `see_also`. Template: `meta/templates/project.md`.
+
+`area` and `project` ship with the template and are always present. They are the only knowledge nodes the plan skill writes, and they are exempt from the provenance requirement: they record an intent, not something learned from a source.
 
 <!-- Add PMS-specific node types here during setup, e.g.:
 - `person` — a human relevant to this PMS. Fields: title, aliases, role, org, edges, sources, see_also. Template: meta/templates/person.md
@@ -25,7 +29,7 @@ Each new type: (1) copy meta/templates/_node.template.md to meta/templates/<type
 
 Unlike node types under **Nodes**, the task schema is **fixed** — it is not extended per PMS. Adding a field to it changes what every capture writes, so treat it as a rulebook-level change, not a setup-time one.
 
-**Fields.** `type` (always the literal `task`), `id`, `title`, `status`, `origin`, `created`, `updated` are required. `due`, `owner`, `tags`, `notes` are optional and omitted entirely when unknown — never filled with a placeholder. `closed` is required **once and only once the status is terminal**. Template: `meta/templates/_task.template.md`.
+**Fields.** `type` (always the literal `task`), `id`, `title`, `status`, `origin`, `created`, `updated` are required. `due`, `deadline`, `owner`, `tags`, `notes` are optional and omitted entirely when unknown — never filled with a placeholder. `todoist_id` is written only by the sync skill. Its absence means the task has not been pushed yet. `closed` is required **once and only once the status is terminal**. Template: `meta/templates/_task.template.md`.
 
 `closed` exists because `updated` cannot answer "how long has this been done?" — `updated` bumps on any edit, so a task finished two months ago and touched yesterday looks fresh. Without a separate date, the archive window is unenforceable and lint's archivable check is guesswork. Set `closed` to the date the status became `done` or `dropped`; clear it if the task is ever reopened.
 
@@ -43,9 +47,30 @@ Unlike node types under **Nodes**, the task schema is **fixed** — it is not ex
 
 **Archiving removes the index entry.** A task in `tasks/archive/` is out of `meta/GRAPH_INDEX.md` entirely — exactly like an archived source in `raw/archive/`. This is what keeps the index bounded: tasks are the fastest-growing file type in the system, and an index that accumulates every one of them forever defeats the "one cheap read" that capture and query triage both depend on. Archived tasks keep their frontmatter and their edges; they are found by scanning `tasks/archive/`, which only a history question does.
 
-**`origin` — closed enum, exactly three values:** `capture` (a human said so), `ingest` (an action item extracted from a source in `raw/`), `query` (surfaced while answering). When `origin` is `ingest`, the task also carries `sources:` pointing at the archived source — that is the one case where a task has provenance.
+**`origin` — closed enum, exactly four values:** `capture` (a human said so — in chat, or added directly in Todoist and adopted by sync), `ingest` (an action item extracted from a source in `raw/`), `query` (surfaced while answering), `plan` (designed by the plan skill as part of a project's tree). When `origin` is `ingest`, the task also carries `sources:` pointing at the archived source — that is the one case where a task has provenance.
 
 **Ownership.** `owner` is a **plain string field**, not a typed edge, because a PMS with no `person` node type has nowhere to point. If this PMS later registers a `person` type, setup should offer to promote `owner` into an `assigned_to` typed edge and register the predicate below. Until then, do not write `assigned_to`.
+
+## Todoist mapping
+
+Fixed by the rulebook, like the task schema. The sync skill applies it.
+
+| PMS | Todoist | Owned by |
+|---|---|---|
+| `area` node | project (`todoist_project_id`) | files |
+| `project` node | section in its area's project (`todoist_section_id`) | files |
+| task `part_of` a project | task in that section | files (placement) |
+| task `part_of` a task | subtask | files (placement) |
+| task with children, created by plan | **uncompletable** parent | files |
+| `depends_on` | `pms-blocked` label + `Waiting on:` description line | files (recomputed by sync) |
+| `status: done` / `closed` | completed / completion date | **Todoist** |
+| `status: dropped` | completed + `pms-dropped` label | files |
+| `status: doing` | not mirrored | files |
+| `due` | due date | **Todoist** |
+| `deadline` | deadline (Pro only; see `meta/SETTINGS.md` § Todoist) | **Todoist** when enabled, else files |
+| `title` | content | **Todoist** after creation |
+| `id` | description footer `PMS: T-0042` | files |
+| other labels, priority, reminders | as in Todoist | **Todoist** (not copied into files, except priority) |
 
 ## Edges
 

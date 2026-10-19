@@ -24,3 +24,15 @@ Operating preferences for this PMS. Defaults shown; setup or the user may change
 
 - **Task ID prefix:** `T` — task IDs are `T-0001`, `T-0002`, … Filenames stay date-slugged (`2026-08-15-email-ana.md`); the ID is frontmatter, not filename.
 - **Archive completed tasks after:** 30 days in a terminal state (`done` / `dropped`). Lint proposes the move; nothing is archived automatically.
+
+## Todoist
+
+Bindings and policies for the task surface. Setup writes these; the sync skill reads them.
+
+- **Connection:** _(unset — setup Step 0 records `connected (<account>)` or `not connected`)_. One PMS per Todoist account.
+- **Plan:** _(unset — read from the account at setup: `free` or `pro`)_. Plan limits — on Free: 5 active projects, no deadlines, one week of activity history — belong to the account owner. When Todoist refuses something for a plan limit, sync reports it and suggests upgrading. It never works around the limit by placing tasks somewhere else.
+- **Deadlines:** `off` on Free, `on` on Pro. While `off`, a task's `deadline` stays in the file and is shown in its description instead.
+- **Unplaced tasks go to:** `inbox` — where a task with no project and no area is pushed.
+- **Adopt from the Inbox:** `no` — Inbox items without a `PMS:` footer are offered for triage, never adopted automatically. Tasks added on the phone *inside a managed section or project* are always adopted.
+- **Labels:** `pms-blocked`, `pms-dropped` — the only labels sync adds or removes. Every other label is the user's.
+- **Sync schedule:** _(unset — setup Q6 records e.g. `daily 07:00 America/Sao_Paulo`, `weekly lint Mon`, or `not scheduled`)_. Whatever the schedule, warn if the last sync is older than **6 days**: Todoist Free keeps one week of activity history.

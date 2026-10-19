@@ -1,13 +1,12 @@
 # PMS template — repository
 
-This repository holds **variants** of a portable Personal Management System template. Each top-level folder is one complete, self-contained variant: its own `CLAUDE.md`, its own `meta/`, its own `.gitignore`. Nothing is shared between them, deliberately — a variant you can't copy out and use on its own isn't a template.
+This repository holds a portable Personal Management System template in `pms/`. Any further top-level folder is a temporary A/B **variant** of it. Each one is complete and self-contained: its own `CLAUDE.md`, its own `meta/`, its own `.gitignore`. Nothing is shared between them, deliberately — a variant you can't copy out and use on its own isn't a template.
 
 ```
 output/
 ├── CLAUDE.md     ← builder rules: variants are artifacts, not instructions
 ├── docs/         ← design record (decisions, ADRs, field-test protocol, v1 handover)
-├── pms/          ← plain template, v2.1.0 — tasks live only in files
-└── pms-todoist/  ← v3.1.0 — same PMS, Todoist as the task surface (ADR-001)
+└── pms/          ← the template, v2.4.0 — PMS with Todoist as the task surface (ADR-001)
 ```
 
 **To use one:** copy the variant folder out, rename it to whatever the system is for, and follow its own `README.md`. It has no dependency on this repository or on any sibling.
@@ -20,8 +19,14 @@ Every variant's `CLAUDE.md` is written as an operating manual for a *running* sy
 
 `capture` is the sharpest edge here: it is deliberately exempt from the first-run gate so that a real user's first "remind me to…" gets written immediately. In a *builder* session that same exemption means a stray imperative is the most likely way to accidentally start operating the template instead of editing it.
 
+## Versions
+
+- **v1.x** — *kbcurator*: the original knowledge-base template (git history up to tag `v1.1.0`; design record in `docs/handover/`).
+- **v2.x** — the Personal Management System. `v2.0.0` added the task layer and `v2.1.0` stabilized it, with tasks living only in files. From `v2.2.0`, Todoist is the task surface. From `v2.4.0`, that is the only template; the files-only PMS lives on in git history.
+
 ## Where the reasoning lives
 
 - `docs/decisions-v2.md` — why v2 is shaped the way it is: the task layer, the two-file schema split, closed enums, the lint passes, and the v2.1.0 stabilization fixes. Read it before proposing a structural change.
-- `docs/field-test-v2.md` — the protocol for the first real run of v2.
+- `docs/adr/` — architecture decision records (001: Todoist as the task surface).
+- `docs/field-test-v2.md` and `docs/field-test-todoist.md` — the protocols for the first real run: core behaviours first, then the Todoist side.
 - `docs/handover/` — the v1.0.1 design record. Docs `01`–`07` are historical; `000_READ_FIRST.md` carries a v1→v2 mapping table and says what has been superseded.

@@ -1,6 +1,6 @@
 # ADR-001 — Todoist as the task surface; the PMS as the planner
 
-- **Status:** Accepted (2026-10-19). Applies to the `pms-todoist/` variant (v3.0.0). The plain `pms/` variant is unchanged.
+- **Status:** Accepted (2026-10-19). Introduced in v2.2.0 as a separate variant, and made the only template (`pms/`) in v2.4.0. The files-only task layer remains in git history (v2.1.0).
 - **Decider:** Fernando
 
 ## Context
@@ -58,8 +58,8 @@ Existing account content: Inbox (9 old items), projects *Saúde*, *Gaming*, *Vid
 
 ## Consequences
 
-- **Invariant amended:** "files are the source of truth" now reads "files are the source of truth for knowledge and structure; Todoist is the source of truth for execution state." This is a v3 change, hence a separate variant.
-- **The variant requires a connector.** Without Todoist reachable, capture still writes the file and marks it pending push. Sync catches up later. Nothing is lost, but phone state is stale until then.
+- **Invariant amended:** "files are the source of truth" now reads "files are the source of truth for knowledge and structure; Todoist is the source of truth for execution state." It shipped first as a separate variant (v2.2.0) and became the only template in v2.4.0.
+- **The template requires a connector.** Without Todoist reachable, capture still writes the file and marks it pending push. Sync catches up later. Nothing is lost, but phone state is stale until then.
 - **Sync is instruction-strength for now** (Claude through the connector). The plan is to move it into a script once the mapping is proven in the field — see the next-phase notes in `../decisions-v2.md`.
 - **Label writes must merge.** Because `labels` replaces the list, sync reads the current labels and adds or removes only `pms-*` ones. Clobbering your own labels is the failure this rule prevents.
 - **Titles can be edited on the phone.** Sync adopts the new title. Links stay valid because task links resolve by file stem (v2.1.0). Only the display text goes stale, and lint reports it as housekeeping.
@@ -68,7 +68,7 @@ Existing account content: Inbox (9 old items), projects *Saúde*, *Gaming*, *Vid
 
 ## Amendment — 2026-10-19: deployment model
 
-**One PMS instance per Todoist account.** Plan limits are the account owner's to lift (upgrade), not a design constraint. Consequences applied in the variant:
+**One PMS instance per Todoist account.** Plan limits are the account owner's to lift (upgrade), not a design constraint. Consequences applied in the template:
 
 - **Connector authorization moved into setup** (Step 0, before the interview). The probe goes through sync. Credentials are never requested in chat. If the user declines, the knowledge side still works and tasks wait as pending push.
 - **Every existing Todoist project is offered as an area by default.** It is the user's account, so opt-out replaces opt-in.

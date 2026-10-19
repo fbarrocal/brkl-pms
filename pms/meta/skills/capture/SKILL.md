@@ -18,17 +18,18 @@ Turn an intent into a task node. **This skill is authoritative for everything in
 3. **Write the file.** Create `tasks/YYYY-MM-DD-short-slug.md` from `meta/templates/_task.template.md`. The date prefix is today's capture date, not the due date. Take the user's words as the title, as an imperative, in the PMS's Language. Do not research, do not restructure the graph, do not ask a clarifying question you could answer from the text.
 4. **Set the fields.**
    - `status: open` unless the user clearly said otherwise; `created` and `updated` to today.
-   - `origin` per the schema: `capture` when a human asked, `ingest` when ingest handed it over, `query` when it came out of an answer.
+   - `origin` per the schema: `capture` when a human asked (or sync adopted it from Todoist), `ingest` when ingest handed it over, `query` when it came out of an answer, `plan` when plan designed it.
    - **`sources:` only when `origin` is `ingest`** — the archived `raw/` path the caller passed you. A task with any other origin has no `sources:` field at all; its provenance *is* its origin.
    - `due` and `owner` only if stated. An unstated optional field is omitted entirely, never filled with a guess or a placeholder. No `closed` — that field appears only when a task goes terminal.
 5. **Link what the index already resolved.** For each thing the task mentions, if it matched an entry's **title or alias exactly** in step 1, write the typed edge using the link **exactly as the index lists it** — a knowledge page's `[[Title]]`, or a task's piped `[[<file-stem>|<Title>]]` (a bare task title resolves to no file) — `about` for what the task concerns, `part_of` for a subtask, `depends_on` for what it waits on, `introduced_by` for where it came from. Everything else stays a plain `[[wikilink]]` in the body.
 6. **Never create a stub node.** A one-line reminder must not add empty pages to `knowledge/`. If the user names something the PMS has never heard of, that is a plain prose link and a lint finding later — not a page. If the thing clearly deserves a node, *say so in your report* and let the user decide.
 7. **Add it to the index.** One line under `## Tasks` in `meta/GRAPH_INDEX.md`: id, piped link (`[[<file-stem>|<Title>]]`), status, and `due` if the task has one — Mode C of the query skill reads this line instead of opening the file, so a missing `due` there costs a full folder scan later. In the **same write**, increment `next_task_id` and bump the index's `updated` date. Writing the task without advancing the counter is how an id gets issued twice.
-8. **Report in one line.** `Captured T-0042 — "<title>" (open) → about [[Project X]]`. Add a second line only if you have a flag: an unresolved mention worth promoting to a node, or a duplicate you found.
+8. **Push to Todoist.** Call `meta/skills/sync/SKILL.md` (Mode 1) for the new id — **unless sync is the caller**, in which case it handles Todoist itself. If Todoist is unreachable, the task stays pending push. Say so in the report, and don't retry here.
+9. **Report in one line.** `Captured T-0042 — "<title>" (open) → about [[Project X]]`. Add a second line only if you have a flag: an unresolved mention worth promoting to a node, or a duplicate you found.
 
 **What capture must not do:** it does not ingest, it does not dedup beyond the exact index match, it does not propose schema changes, it does not write to `knowledge/`, and it does not ask more than one question. If the request turns out to be material to be understood rather than an intent to act, stop and route to ingest instead.
 
-**Batch captures.** When several action items arrive at once (usually from ingest), read the index once, write them all with consecutive ids starting at `next_task_id`, advance the counter past the last one, then report as one list. Each still gets its own file and its own index line.
+**Batch captures.** When several items arrive at once (from ingest, or a whole tree from plan), the caller may express edges between items of the same batch as references to each other ("2.1 depends on 1.3"). Write parents before children, then resolve each reference to the real link of the task you just wrote. Push the whole batch to sync in one call, in tree order. Otherwise: read the index once, write them all with consecutive ids starting at `next_task_id`, advance the counter past the last one, then report as one list. Each still gets its own file and its own index line.
 
 ## Mode B — update, complete, or drop a task
 
@@ -40,7 +41,8 @@ For "mark T-0042 done", "that one's blocked", "drop the Ana thing", "push this t
 4. **`blocked` needs a reason.** Either a `depends_on` edge pointing at what it waits for, or a `notes` line. A task that is blocked on nothing recorded is just an open task, and lint will flag it.
 5. **`dropped` needs a reason too** — a `notes` line saying why. Dropping is a decision worth keeping; deleting it loses the decision.
 6. **Never delete the file.** There is no completion path that removes a task. Terminal tasks stay in `tasks/` until archived.
-7. **Update the index** entry's status. Report in one line.
+7. **Update the index** entry's status.
+8. **Push** — call sync (Mode 1) for the id, unless sync is the caller (it is applying a change that came *from* Todoist). Report in one line.
 
 ## Mode C — archive
 

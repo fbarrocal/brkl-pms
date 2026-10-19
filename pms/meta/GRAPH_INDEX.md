@@ -3,6 +3,7 @@ type: index
 title: Personal Management System Index
 updated: <YYYY-MM-DD>
 next_task_id: T-0001   # monotonic counter — capture takes this id and increments it; never lowered, never derived from the entries below
+todoist_synced_at:     # set by the sync skill at the end of a completed run; empty = never synced
 ---
 
 # Index

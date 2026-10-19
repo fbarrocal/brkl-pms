@@ -7,10 +7,12 @@ type: task
 id: T-0000                    # stable, never reused; taken from next_task_id in meta/GRAPH_INDEX.md
 title: <What needs to happen — an imperative, in the PMS's Language>
 status: open                  # open | doing | blocked | done | dropped  — no other value
-origin: capture               # capture | ingest | query
+origin: capture               # capture | ingest | query | plan
 
 # --- optional: omit the line entirely rather than writing a placeholder ---
 # due: <YYYY-MM-DD>
+# deadline: <YYYY-MM-DD>       # pushed to Todoist only when SETTINGS § Todoist has deadlines: on
+# todoist_id: ""              # written ONLY by the sync skill; absent = not pushed yet. A cache, not identity.
 # owner: ""                   # plain string, NOT a typed edge (see GRAPH_SCHEMA § Tasks)
 # tags: []
 # notes: ""                   # why it's blocked, why it was dropped, any context that isn't a link

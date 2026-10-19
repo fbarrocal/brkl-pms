@@ -1,6 +1,8 @@
 # Personal Management System template
 
-**v2.1.0** — a generic, self-contained skeleton for a **Personal Management System**: a knowledge graph with a task layer, for anything you need to both understand and act on — personal notes, a research topic, a book, a project, a work stream. Your markdown files are the source of truth; the agent (Cowork or Claude Code) is curator, query engine, and task tracker. No database, no embeddings, no required plugin. It starts empty and configures itself to your purpose on the first message.
+**v2.4.0** — the PMS (a knowledge graph with a task layer) with **Todoist as the task surface**. The PMS plans: it breaks goals into tasks, tracks what waits on what, and links work to what you know. Todoist is where you see, get reminded about, and tick off the tasks, on every device. The files own structure; Todoist owns execution state. Design record: `docs/adr/001-todoist-task-surface.md` in the template repository.
+
+It needs the **Todoist connector** enabled in Claude; setup asks you to connect it. Without it, the knowledge side works and tasks queue up as *pending push*.
 
 Two things go in — material you want understood, and things you need to do — and both end up as typed, cross-referenced nodes in one graph.
 
@@ -8,7 +10,7 @@ Two things go in — material you want understood, and things you need to do —
 
 **Project description — paste this when creating the project:**
 
-> This project is a Personal Management System: a self-curated knowledge graph with a task layer. Sources go in, typed and cross-referenced knowledge comes out, tasks are captured alongside it, and questions are answered from all of it. `CLAUDE.md` in this folder is the operating manual — follow it for every request; it defines the curator's role and conduct and routes every operation (setup, capture, ingest, query, lint) to its procedure under `meta/skills/`. This PMS's vocabulary lives in `meta/GRAPH_SCHEMA.md` and its configuration in `meta/SETTINGS.md`.
+> This project is a Personal Management System: a self-curated knowledge graph with a task layer. Sources go in, typed and cross-referenced knowledge comes out, goals are planned into tasks that live in Todoist, and questions are answered from all of it. `CLAUDE.md` in this folder is the operating manual — follow it for every request; it defines the curator's role and conduct and routes every operation (setup, capture, plan, ingest, query, sync, lint) to its procedure under `meta/skills/`. This PMS's vocabulary lives in `meta/GRAPH_SCHEMA.md` and its configuration in `meta/SETTINGS.md`.
 
 Then:
 
@@ -16,8 +18,9 @@ Then:
 2. **Enable file operations.** Claude Desktop → Settings → Capabilities → turn on **Code execution and file creation**.
 3. **Create the project starting FROM this folder.** Cowork tab → Projects → **New project → "Use an existing folder"** → select this folder. Start from the folder — don't create an empty project and try to attach the folder afterwards. Paste the blurb above into the project description/instructions. Keep **Memory on**.
 4. **Send your first message.** Because `setup_done` is `false`, the agent runs the setup skill: a short structured interview — purpose, node types, edges, language — whose answers it writes into `meta/SETTINGS.md` and `meta/GRAPH_SCHEMA.md`. **One exception:** if your first message is a task ("remind me to call Ana"), it captures the task first and offers setup after. You should never have to sit through an interview to write down one thing you need to do.
+   Setup starts by checking the **Todoist connector**. If it isn't authorized yet, it asks you to connect it (one PMS per Todoist account) and waits. It never asks for a password or token in chat. Near the end, it asks whether to **schedule the daily sync** (and an optional weekly lint) and creates the scheduled tasks if you say yes.
 5. **Then just use it.** Drop material in `raw/` and ask to ingest. Say "remind me to…" and it becomes a task. Ask questions of either.
-6. **(Optional) Automate upkeep.** Add a scheduled task to the project: *"toda segunda, rode o lint rápido (Pass A) e liste as fontes pendentes em raw/ e as tasks abertas."* Schedule the quick pass only — the deeper ones are expensive and worth asking for deliberately.
+6. **Don't skip the sync schedule.** The sync is what moves completions from your phone into the PMS and unblocks the next steps. If you said "not now" during setup, say "schedule the sync" any time.
 
 ## Layout
 
@@ -34,10 +37,12 @@ your-pms-folder/
     ├── GRAPH_INDEX.md       # navigation entry point — nodes + tasks, with aliases and statuses
     ├── GRAPH_SCHEMA.md      # the closed vocabulary: node types, task schema, edge predicates
     ├── SETTINGS.md          # this PMS's purpose, language, conventions, setup state
-    ├── skills/              # setup / capture / ingest / query / lint — single source of truth
+    ├── skills/              # setup / capture / plan / ingest / query / sync / lint — single source of truth
     └── templates/
         ├── _node.template.md   # generic seed — copy to meta/templates/<type>.md
-        └── _task.template.md   # the fixed task shape — never copied, never customized
+        ├── _task.template.md   # the fixed task shape — never copied, never customized
+        ├── area.md             # an area = one Todoist project
+        └── project.md          # a project = one section in its area's Todoist project
 ```
 
 The split that matters: `CLAUDE.md` is static and identical across every PMS you build from it — the agent never edits it, and never writes outside this folder at all. Everything specific to THIS PMS lives in exactly two files, both under `meta/`: `GRAPH_SCHEMA.md` (what may exist) and `SETTINGS.md` (what this PMS is). Knowledge and work (`raw/`, `knowledge/`, `tasks/`) are yours; machinery (`meta/`) is the system's. To upgrade the rulebook across many systems later, copy one file.
@@ -55,7 +60,7 @@ The split that matters: `CLAUDE.md` is static and identical across every PMS you
 - **Edges are typed frontmatter fields** — a relationship is a frontmatter field named for the predicate, holding wikilinks (e.g. `part_of: ["[[A Larger Thing]]"]`, `contradicts: ["[[A Rival Claim]]"]`). Because it's plain frontmatter, the whole Obsidian metadata ecosystem can read the graph — no plugin required (see **How to read the content**).
 - **Retrieval is navigation, not vector search.** The agent reads `meta/GRAPH_INDEX.md` and traverses typed edges — no embeddings.
 
-## The five operations
+## The seven operations
 
 | You say | It runs |
 |---|---|
@@ -63,7 +68,9 @@ The split that matters: `CLAUDE.md` is static and identical across every PMS you
 | drop a file in `raw/`, "ingest this" | **ingest** — nodes, edges, and any action items it finds |
 | "what do I know about X", "what's blocking X", "what's open" | **query** — lookup, traversal, or task triage |
 | "add a node type", "novo edge" | **setup** — the only skill that edits the schema |
-| "lint", "what's broken" | **lint** — 18 health checks in three cost tiers, proposes but never applies unasked |
+| "plan X", "break this down", "quebra em tarefas" | **plan** — proposes a task tree with dependencies, writes it on approval, and puts the whole tree in Todoist |
+| "sync", or the daily scheduled run | **sync** — pulls what you did on your phone, adopts tasks you added there, and unblocks what can now start |
+| "lint", "what's broken" | **lint** — 20 health checks in three cost tiers, including Todoist drift; proposes but never applies unasked |
 
 Each operation is owned by exactly one skill, and skills call each other rather than duplicating work: ingest calls capture for action items, lint routes its fixes back through the skill that owns them.
 
@@ -103,25 +110,30 @@ Both tools can share this folder safely: each keeps its session state in its own
 3. The included `.gitignore` keeps tool scratch and local overrides out of history.
 4. Use Claude Code for occasional heavy jobs — bulk ingest, a full re-lint, git commits — while Cowork stays your day-to-day chat curator. Claude Code reads the same `CLAUDE.md`, which routes it to the same `meta/skills/` procedures.
 
-## Upgrading an existing PMS from v2.0.0
+## How Todoist is used
 
-v2.1.0 fixes two v2.0.0 defects: task ids could be reissued after archiving, and links to tasks did not resolve in Obsidian. Two edits:
+| In the PMS | In Todoist |
+|---|---|
+| an **area** (e.g. Saúde) | a project |
+| a **project** in that area (e.g. "Check-up 2026") | a section of that project |
+| a task in the project | a task in the section |
+| a task that is part of another task | a subtask |
+| a group of steps created by `plan` | a parent you can't tick (completing a Todoist parent would complete every step under it) |
+| a step waiting on another | label `pms-blocked` + a "Waiting on:" line — removed by sync when it can start |
+| dropped | completed + label `pms-dropped` (nothing is ever deleted) |
 
-1. **Add the counter.** In `meta/GRAPH_INDEX.md` frontmatter, add `next_task_id:` set to the highest id in `tasks/` and `tasks/archive/`, plus one.
-2. **Rewrite task links to piped form.** Every link to a task — in the index's `## Tasks` lines and in any edge field — becomes `[[<file-stem>|<Title>]]`. Then copy in the new `CLAUDE.md`, `meta/skills/`, and both templates, and run a full lint (Pass B); #5 reports any bare task link you missed.
+**What you can do on your phone:** complete, reopen, reschedule, rename, add reminders and your own labels, and add new tasks inside a managed section. Sync picks all of that up.
+**What to do in the PMS instead:** restructure — move a task to another project, change what waits on what, drop a task with a reason. If you move a task on the phone, sync asks you rather than guessing.
+**The Inbox is yours.** Sync never adopts Inbox items on its own; it offers the newest ones for triage.
 
-## Upgrading an existing PMS from v1.x
+**One PMS per Todoist account.** Setup offers every existing Todoist project as an area; exclude the ones you want left alone. **Plan limits are yours to lift:** on Todoist Free (5 active projects, no deadlines, one week of activity history), the PMS tells you when a limit blocks something and suggests upgrading. It doesn't work around it. On Free, `deadline` stays in the file and appears in the task description.
 
-v2.0.0 renames folders and splits the settings file, so an existing PMS needs a migration pass. It is mechanical, but do it in one sitting — a half-migrated PMS has the agent reading paths that no longer exist.
+## Upgrading from v2.1.x (tasks in files only)
 
-1. **Rename the folders.** `sources/` → `raw/`, `content/` → `knowledge/`. Create empty `tasks/`.
-2. **Rewrite provenance paths.** Every knowledge page's `sources:` entries still say `sources/archive/…`; they must say `raw/archive/…`. Find-and-replace across `knowledge/` handles it. This is the one step that silently breaks lint's round-trip check if skipped.
-3. **Split the settings file.** Move `SETTINGS.md` to `meta/SETTINGS.md`, keeping Purpose and Language; move its **Nodes** and **Edges** sections into the new `meta/GRAPH_SCHEMA.md`, and add the **Tasks** section from this template.
-4. **Rename the index.** `meta/index.md` → `meta/GRAPH_INDEX.md`, and add a `## Tasks` section. Nothing goes in it yet — v1 had no tasks.
-5. **Copy in the new machinery.** `CLAUDE.md`, all of `meta/skills/`, and `meta/templates/_task.template.md` from this template. Add `next_task_id: T-0001` to the index frontmatter.
-   - **Check filenames.** v2.1+ requires each knowledge page's filename to be its title. Rename any that differ, or their links will not resolve.
-6. **Drop the host-embed pieces.** Delete `meta/host-snippet.md`. If a host project's `CLAUDE.md` carries a `kb-host-snippet` block, remove it by hand — v2 systems are top-level and no skill writes outside the PMS folder anymore.
-7. **Run a full lint (Pass B).** It will find whatever step 2 missed — the broken provenance round-trips only show up in the pass that resolves edges across files.
+1. Copy in this template's `CLAUDE.md`, all of `meta/skills/`, and `meta/templates/` (including `area.md` and `project.md`).
+2. Merge `meta/GRAPH_SCHEMA.md`: add the `area` and `project` node types, the four-value `origin` enum, the task fields `deadline` and `todoist_id`, and the § Todoist mapping section. Keep your own types and predicates.
+3. Add the § Todoist section to `meta/SETTINGS.md`, and `todoist_synced_at:` to the index frontmatter.
+4. Say "configure o Todoist" to run setup's Todoist question, which binds your areas. Then say "sync — push all pending" so every existing open task goes to Todoist.
 
 ## Two things to know going in
 

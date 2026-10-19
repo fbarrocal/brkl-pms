@@ -1,4 +1,6 @@
-# Field test 05 — first real run of v2
+# Field test 05 — first real run of v2 (core behaviours)
+
+> Since v2.4.0 the template includes Todoist. This protocol covers the core: capture, ingest, query, archive and lint. Run it with the Todoist connector **off**, so tasks stay pending push; at setup, decline the connection in Step 0. Then run `field-test-todoist.md` for the Todoist side.
 
 Nothing in v2 has been run against real material. This protocol tests the behaviors v2 depends on that only a live session can confirm. It is a run of the *template*, so do it **outside this repository**, in a scratch copy, and bring the notes back here.
 
