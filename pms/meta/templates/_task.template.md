@@ -4,7 +4,7 @@
 # Filename: YYYY-MM-DD-short-slug.md  (the date is capture date, not due date)
 
 type: task
-id: T-0000                    # stable, never reused; next id = highest in tasks/ + tasks/archive/, + 1
+id: T-0000                    # stable, never reused; taken from next_task_id in meta/GRAPH_INDEX.md
 title: <What needs to happen — an imperative, in the PMS's Language>
 status: open                  # open | doing | blocked | done | dropped  — no other value
 origin: capture               # capture | ingest | query
@@ -21,10 +21,11 @@ origin: capture               # capture | ingest | query
 # --- typed edges (predicates from "Edges" in meta/GRAPH_SCHEMA.md) ---
 # Same vocabulary as knowledge nodes — tasks need no predicates of their own:
 #   about:       - "[[The Topic Or Project]]"     # what this task concerns
-#   part_of:     - "[[The Parent Task]]"          # subtask
+#   part_of:     - "[[2026-08-10-parent-slug|The Parent Task]]"   # subtask — tasks are linked by file stem|title
 #   depends_on:  - "[[What It Waits On]]"         # pairs with status: blocked
 #   introduced_by: - "[[The Source Or Person]]"   # where it came from
-# Only exact title/alias matches from meta/GRAPH_INDEX.md become edges at capture time.
+# Only exact title/alias matches from meta/GRAPH_INDEX.md become edges at capture time, written as
+# the index lists them: knowledge pages as [[Title]], tasks as [[file-stem|Title]].
 # An unrecognized name stays a plain [[wikilink]] in the body — never invent a stub node for it.
 
 # sources: []                 # ONLY when origin is ingest — the archived raw/ path

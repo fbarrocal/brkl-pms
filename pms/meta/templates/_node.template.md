@@ -4,7 +4,7 @@
 # Templates are OPTIONAL: a node can exist with just `type` + prose and no template.
 # For tasks, use meta/templates/_task.template.md instead — that shape is fixed, not copied.
 type: <type-name>
-title: <Node name>
+title: <Node name>        # also the filename: knowledge/<Node name>.md
 aliases: []
 tags: []
 

@@ -5,7 +5,7 @@ description: Configure or evolve this Personal Management System's schema. Use o
 
 # Setup
 
-Configures the two files the agent may edit: `meta/SETTINGS.md` (purpose, language, conventions, `setup_done`) and `meta/GRAPH_SCHEMA.md` (node types, edge predicates) — plus templates in `meta/templates/`. **This skill is authoritative for both files**; no other skill edits them, and every schema change routes here. It never edits `CLAUDE.md`, and it never writes outside this PMS folder.
+Configures the two mutable rules files: `meta/SETTINGS.md` (purpose, language, conventions, `setup_done`) and `meta/GRAPH_SCHEMA.md` (node types, edge predicates) — plus templates in `meta/templates/`. **This skill is authoritative for both files**; no other skill edits them, and every schema change routes here. It never edits `CLAUDE.md`, and it never writes outside this PMS folder.
 
 **Prerequisite:** `CLAUDE.md` — operate by it.
 

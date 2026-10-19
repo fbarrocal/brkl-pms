@@ -6,7 +6,7 @@ setup_done: false
 
 This PMS's **state and configuration**: what it is for, what language it is written in, and whether it has been set up (`setup_done`, in the frontmatter above). Written once at first run and rarely again.
 
-This is one of exactly two files the agent may edit. The other is `meta/GRAPH_SCHEMA.md`, which holds the *vocabulary* — node types, the task schema, and edge predicates. Keep the two apart: settings answer "what is this PMS", schema answers "what may exist in it". The static rules live in `CLAUDE.md` and are never edited.
+This is one of exactly two mutable **rules** files (the agent also maintains the index, templates, and content, but none of those define rules). The other is `meta/GRAPH_SCHEMA.md`, which holds the *vocabulary* — node types, the task schema, and edge predicates. Keep the two apart: settings answer "what is this PMS", schema answers "what may exist in it". The static rules live in `CLAUDE.md` and are never edited.
 
 ## Purpose
 

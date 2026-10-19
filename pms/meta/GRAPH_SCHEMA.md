@@ -2,7 +2,7 @@
 
 The **closed vocabulary** of this Personal Management System: which kinds of thing may exist, and which kinds of relationship may connect them. Every operation reads this file. Nothing outside these lists may be written — propose an addition here (via the setup skill) rather than inventing one.
 
-This is one of exactly two files the agent may edit. The other is `meta/SETTINGS.md`, which holds this PMS's *state and configuration* (purpose, language, setup flag). The split is deliberate: this file is a vocabulary that grows and is diffed when it changes; the other is configuration, written once and rarely again. The static rules live in `CLAUDE.md` and are never edited.
+This is one of exactly two mutable **rules** files (the agent also maintains the index, templates, and content, but none of those define rules). The other is `meta/SETTINGS.md`, which holds this PMS's *state and configuration* (purpose, language, setup flag). The split is deliberate: this file is a vocabulary that grows and is diffed when it changes; the other is configuration, written once and rarely again. The static rules live in `CLAUDE.md` and are never edited.
 
 ## Nodes
 

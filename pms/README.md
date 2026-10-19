@@ -1,6 +1,6 @@
 # Personal Management System template
 
-**v2.0.0** — a generic, self-contained skeleton for a **Personal Management System**: a knowledge graph with a task layer, for anything you need to both understand and act on — personal notes, a research topic, a book, a project, a work stream. Your markdown files are the source of truth; the agent (Cowork or Claude Code) is curator, query engine, and task tracker. No database, no embeddings, no required plugin. It starts empty and configures itself to your purpose on the first message.
+**v2.1.0** — a generic, self-contained skeleton for a **Personal Management System**: a knowledge graph with a task layer, for anything you need to both understand and act on — personal notes, a research topic, a book, a project, a work stream. Your markdown files are the source of truth; the agent (Cowork or Claude Code) is curator, query engine, and task tracker. No database, no embeddings, no required plugin. It starts empty and configures itself to your purpose on the first message.
 
 Two things go in — material you want understood, and things you need to do — and both end up as typed, cross-referenced nodes in one graph.
 
@@ -103,6 +103,13 @@ Both tools can share this folder safely: each keeps its session state in its own
 3. The included `.gitignore` keeps tool scratch and local overrides out of history.
 4. Use Claude Code for occasional heavy jobs — bulk ingest, a full re-lint, git commits — while Cowork stays your day-to-day chat curator. Claude Code reads the same `CLAUDE.md`, which routes it to the same `meta/skills/` procedures.
 
+## Upgrading an existing PMS from v2.0.0
+
+v2.1.0 fixes two v2.0.0 defects: task ids could be reissued after archiving, and links to tasks did not resolve in Obsidian. Two edits:
+
+1. **Add the counter.** In `meta/GRAPH_INDEX.md` frontmatter, add `next_task_id:` set to the highest id in `tasks/` and `tasks/archive/`, plus one.
+2. **Rewrite task links to piped form.** Every link to a task — in the index's `## Tasks` lines and in any edge field — becomes `[[<file-stem>|<Title>]]`. Then copy in the new `CLAUDE.md`, `meta/skills/`, and both templates, and run a full lint (Pass B); #5 reports any bare task link you missed.
+
 ## Upgrading an existing PMS from v1.x
 
 v2.0.0 renames folders and splits the settings file, so an existing PMS needs a migration pass. It is mechanical, but do it in one sitting — a half-migrated PMS has the agent reading paths that no longer exist.
@@ -111,7 +118,8 @@ v2.0.0 renames folders and splits the settings file, so an existing PMS needs a 
 2. **Rewrite provenance paths.** Every knowledge page's `sources:` entries still say `sources/archive/…`; they must say `raw/archive/…`. Find-and-replace across `knowledge/` handles it. This is the one step that silently breaks lint's round-trip check if skipped.
 3. **Split the settings file.** Move `SETTINGS.md` to `meta/SETTINGS.md`, keeping Purpose and Language; move its **Nodes** and **Edges** sections into the new `meta/GRAPH_SCHEMA.md`, and add the **Tasks** section from this template.
 4. **Rename the index.** `meta/index.md` → `meta/GRAPH_INDEX.md`, and add a `## Tasks` section. Nothing goes in it yet — v1 had no tasks.
-5. **Copy in the new machinery.** `CLAUDE.md`, all of `meta/skills/`, and `meta/templates/_task.template.md` from this template.
+5. **Copy in the new machinery.** `CLAUDE.md`, all of `meta/skills/`, and `meta/templates/_task.template.md` from this template. Add `next_task_id: T-0001` to the index frontmatter.
+   - **Check filenames.** v2.1+ requires each knowledge page's filename to be its title. Rename any that differ, or their links will not resolve.
 6. **Drop the host-embed pieces.** Delete `meta/host-snippet.md`. If a host project's `CLAUDE.md` carries a `kb-host-snippet` block, remove it by hand — v2 systems are top-level and no skill writes outside the PMS folder anymore.
 7. **Run a full lint (Pass B).** It will find whatever step 2 missed — the broken provenance round-trips only show up in the pass that resolves edges across files.
 
