@@ -106,3 +106,4 @@ Behaviour added:
 
 Fernando's decision. A PMS is usually about one subject, so by default it lives in one Todoist project — a new one named after it, unless the user picks an existing one. Everything else in the account is left alone. Managing several projects (`multiple` mode) happens only on an explicit ask at setup. Footer `PMS: <pms-id>/T-0042` so several PMSes can share an account. Inbox triage removed. Full record: ADR-001, Amendment 2.
 - **2026-10-20:** A mock bucket ("PMS Demo", since archived) showed that Todoist returns an uncompletable header's name with a `* ` prefix. Sync now ignores that prefix when comparing titles; otherwise every pull would report each phase as renamed. Lint checks the marker in both directions.
+- **2026-10-20:** Repository moved out of the old `kbcurator/output/` folder to its own root (`brkl-pms/`), and the GitHub repo was renamed `kbcurator` → `brkl-pms` (GitHub redirects the old URL). No template change.

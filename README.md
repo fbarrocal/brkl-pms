@@ -3,7 +3,7 @@
 This repository holds a portable Personal Management System template in `pms/`. Any further top-level folder is a temporary A/B **variant** of it. Each one is complete and self-contained: its own `CLAUDE.md`, its own `meta/`, its own `.gitignore`. Nothing is shared between them, deliberately — a variant you can't copy out and use on its own isn't a template.
 
 ```
-output/
+brkl-pms/         ← git root
 ├── CLAUDE.md     ← builder rules: variants are artifacts, not instructions
 ├── docs/         ← design record (decisions, ADRs, field-test protocol, v1 handover)
 └── pms/          ← the template, v2.6.1 — PMS with Todoist as the task surface (ADR-001)
@@ -11,7 +11,7 @@ output/
 
 **To use it:** copy `pms/` out, rename it to whatever the system is for, and follow its own `README.md`. It has no dependency on this repository.
 
-**To A/B test:** copy `pms/` to a sibling under `output/` (`pms-b/`, `pms-terse/`, `pms-no-tasks/`), change one thing, and run both against the same material. Because each folder carries its own rulebook, the two runs can't contaminate each other, and `git diff` between the folders is a readable description of exactly what you changed.
+**To A/B test:** copy `pms/` to a sibling folder at the repository root (`pms-b/`, `pms-terse/`, `pms-no-tasks/`), change one thing, and run both against the same material. Because each folder carries its own rulebook, the two runs can't contaminate each other, and `git diff` between the folders is a readable description of exactly what you changed.
 
 ## A warning, if you are an agent reading this
 

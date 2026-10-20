@@ -18,7 +18,7 @@ So, in this repository:
 ## Layout
 
 ```
-output/                  ← git root
+brkl-pms/                ← git root
 ├── CLAUDE.md            ← this file (builder rules)
 ├── README.md            ← what the repo is, how variants work
 ├── docs/
