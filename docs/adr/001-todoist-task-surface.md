@@ -92,6 +92,21 @@ Costs accepted with it:
 - phase-heavy plans producing many headers that can't be ticked.
 If any of these happens, switch a project to its own Todoist project with phases as sections.
 
+## Amendment 2 — 2026-10-20: one bucket per PMS
+
+**A PMS is usually about one subject, so by default it lives in one Todoist project — its bucket.** The user's other projects and the Inbox are never read or written. This supersedes the 2026-10-19 rule "one PMS per Todoist account; every existing project offered as an area" (Fernando's decision).
+
+- **Default `Mode: single`.** Exactly one `area` node, bound to the bucket. PMS projects are sections in it; phases are parent tasks that can't be ticked, as before. The mapping table above still applies, with one area.
+- **`Mode: multiple`** keeps the original one-project-per-area mapping, but only when the user explicitly asks for it at setup (Q5) or later through setup Mode 2.
+- **Setup Q5 offers:** a new project named after the PMS (recommended, nothing adopted), an existing project (its sections and tasks are adopted, with counts stated before the user confirms), or several projects (`multiple`).
+- **Unplaced tasks go to the bucket, outside any section — never the Inbox.** Inbox triage is removed; the sync reads only bound projects.
+- **The task footer becomes `PMS: <pms-id>/T-0042`.** Several PMSes can now share one account, each with its own `T-0001…`, so the footer must say which PMS a task belongs to. Footer searches are scoped to bound projects and matched exactly. No PMS from v2.5 or earlier has been used yet, so nothing needs migrating.
+
+Consequences:
+- A PMS has room for 20 live sections, i.e. 20 live projects, in its bucket (Todoist's per-project section limit) [Likely].
+- On Todoist Free, one bucket per PMS means up to five PMSes, or fewer if the user's own projects take slots.
+- The area/project → project/section revisit triggers above now apply per bucket.
+
 ## Unproven (field test before relying on it)
 
 - Uncompletable parents behave as headers on mobile and block accidental completion. [Likely, not yet tested]

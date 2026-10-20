@@ -12,7 +12,7 @@ Turn a goal into a tree of tasks — the pipeline-manager part of the PMS. **Thi
 
 ## Mode A — new plan
 
-1. **Read `meta/GRAPH_INDEX.md`** once. Find the area this belongs to and whether a `project` node for it already exists. If one exists, this is a re-plan — go to Mode B.
+1. **Read `meta/GRAPH_INDEX.md`** once. Find the area this belongs to (in single mode, always the bucket) and whether a `project` node for it already exists. If one exists, this is a re-plan — go to Mode B.
 2. **Read the context the plan depends on.** Open the knowledge pages the goal is `about` — what the PMS already knows changes what the steps are. Do not research outside the PMS unless the user asks.
 3. **Draft the tree.** Shape rules:
    - **Leaves are actions** — one sitting, one verb, obvious when finished. "Email Ana the draft", not "Handle Ana".
@@ -36,7 +36,7 @@ Open questions: <anything you had to assume>
 
    Ask for approval, edits, or a different cut. Iterate until approved. **Do not write a partial plan** while the user is still deciding.
 5. **On approval, write the structure:**
-   - **Project node.** If none exists, create `knowledge/<Project>.md` from `meta/templates/project.md`, with `part_of: ["[[<Area>]]"]`. The same goes for a new area (`meta/templates/area.md`); ask first, because a new area becomes a new Todoist project. These two node types are the only knowledge pages this skill writes. They are exempt from the provenance check because they record an intent, not a source. Add each one to the index.
+   - **Project node.** If none exists, create `knowledge/<Project>.md` from `meta/templates/project.md`, with `part_of: ["[[<Area>]]"]`. In single mode the area is always the bucket, so plan never creates one. In `multiple` mode a new area (`meta/templates/area.md`) means a new Todoist project: ask first. These two node types are the only knowledge pages this skill writes. They are exempt from the provenance check because they record an intent, not a source. Add each one to the index.
    - **Tasks.** Call capture **once, as a batch**, with every node of the tree in order (parents first):
      - the title;
      - `origin: plan`;

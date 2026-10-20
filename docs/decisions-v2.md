@@ -101,3 +101,7 @@ Behaviour added:
 - Setup Q5 states what binding implies (existing sections and tasks get adopted) and offers a first sync.
 - A chat edit to a Todoist-owned field (due date, title, priority) is pushed; Todoist's value wins only on a pull.
 - The index is re-read immediately before every write, because a scheduled sync and a chat session can run at once.
+
+## v2.6.0 (2026-10-20) — one Todoist bucket per PMS
+
+Fernando's decision. A PMS is usually about one subject, so by default it lives in one Todoist project — a new one named after it, unless the user picks an existing one. Everything else in the account is left alone. Managing several projects (`multiple` mode) happens only on an explicit ask at setup. Footer `PMS: <pms-id>/T-0042` so several PMSes can share an account. Inbox triage removed. Full record: ADR-001, Amendment 2.

@@ -1,6 +1,6 @@
 # Personal Management System template
 
-**v2.5.0** — the PMS (a knowledge graph with a task layer) with **Todoist as the task surface**. The PMS plans: it breaks goals into tasks, tracks what waits on what, and links work to what you know. Todoist is where you see, get reminded about, and tick off the tasks, on every device. The files own structure; Todoist owns execution state. Design record: `docs/adr/001-todoist-task-surface.md` in the template repository.
+**v2.6.0** — the PMS (a knowledge graph with a task layer) with **Todoist as the task surface**. The PMS plans: it breaks goals into tasks, tracks what waits on what, and links work to what you know. Todoist is where you see, get reminded about, and tick off the tasks, on every device. The files own structure; Todoist owns execution state. Design record: `docs/adr/001-todoist-task-surface.md` in the template repository.
 
 It needs the **Todoist connector** enabled in Claude; setup asks you to connect it. Without it, the knowledge side works and tasks queue up as *pending push*.
 
@@ -18,8 +18,8 @@ Then:
 2. **Enable file operations.** Claude Desktop → Settings → Capabilities → turn on **Code execution and file creation**.
 3. **Create the project starting FROM this folder.** Cowork tab → Projects → **New project → "Use an existing folder"** → select this folder. Start from the folder — don't create an empty project and try to attach the folder afterwards. Paste the blurb above into the project description/instructions. Keep **Memory on**.
 4. **Send your first message.** Because `setup_done` is `false`, the agent runs the setup skill:
-   - **Connect Todoist.** It checks the Todoist connector first. If it isn't authorized yet, it asks you to connect it (one PMS per Todoist account) and waits. It never asks for a password or token in chat.
-   - **A short interview:** purpose, node types, edges, language, which Todoist projects are areas, and whether to **schedule the daily sync** (plus an optional weekly lint). It creates the scheduled tasks only if you say yes.
+   - **Connect Todoist.** It checks the Todoist connector first. If it isn't authorized yet, it asks you to connect it and waits. It never asks for a password or token in chat.
+   - **A short interview:** purpose, node types, edges, language, which Todoist project this PMS lives in (a new one named after it, by default), and whether to **schedule the daily sync** (plus an optional weekly lint). It creates the scheduled tasks only if you say yes.
    - **One exception:** if your first message is a task ("remind me to call Ana"), it captures the task first and offers setup after. That task reaches Todoist when setup finishes. You should never have to sit through an interview to write down one thing you need to do.
 5. **Then just use it.** Drop material in `raw/` and ask to ingest. Say "remind me to…" and it becomes a task. Ask questions of either.
 6. **Don't skip the sync schedule.** The sync is what moves completions from your phone into the PMS and unblocks the next steps. If you said "not now" during setup, say "schedule the sync" any time.
@@ -116,26 +116,24 @@ Both tools can share this folder safely: each keeps its session state in its own
 
 | In the PMS | In Todoist |
 |---|---|
-| an **area** (e.g. Saúde) | a project |
-| a **project** in that area (e.g. "Check-up 2026") | a section of that project |
+| the PMS itself (its single **area**) | one project — the PMS's bucket, e.g. "Saúde" |
+| a **project** (e.g. "Check-up 2026") | a section of that project |
 | a task in the project | a task in the section |
 | a task that is part of another task | a subtask |
 | a group of steps created by `plan` | a parent you can't tick (completing a Todoist parent would complete every step under it) |
 | a step waiting on another | label `pms-blocked` + a "Waiting on:" line — removed by sync when it can start |
 | dropped | completed + label `pms-dropped` (nothing is ever deleted) |
 
-**What you can do on your phone:** complete, reopen, reschedule, rename, add reminders and your own labels, and add new tasks inside a managed section. Sync picks all of that up.
+**What you can do on your phone:** complete, reopen, reschedule, rename, add reminders and your own labels, and add new tasks inside the bucket. Sync picks all of that up.
 **What to do in the PMS instead:** restructure — move a task to another project, change what waits on what, drop a task with a reason. If you move a task on the phone, sync asks you rather than guessing.
-**The Inbox is yours.** Sync never adopts Inbox items on its own; it offers the newest ones for triage.
-
-**One PMS per Todoist account.** Setup offers every existing Todoist project as an area; exclude the ones you want left alone. **Plan limits are yours to lift:** on Todoist Free (5 active projects, no deadlines, one week of activity history), the PMS tells you when a limit blocks something and suggests upgrading. It doesn't work around it. On Free, `deadline` stays in the file and appears in the task description.
+**Everything else is yours.** The PMS reads and writes only its bucket. Your Inbox and your other projects are never touched, so one Todoist account can hold several PMSes, each in its own project. If you want a PMS to manage several Todoist projects, say so at setup (`multiple` mode: one project per area). **Plan limits are yours to lift:** on Todoist Free (5 active projects, no deadlines, one week of activity history), the PMS tells you when a limit blocks something and suggests upgrading. It doesn't work around it. On Free, `deadline` stays in the file and appears in the task description.
 
 ## Upgrading from v2.1.x (tasks in files only)
 
 1. Copy in this template's `CLAUDE.md`, all of `meta/skills/`, and `meta/templates/` (including `area.md` and `project.md`).
 2. Merge `meta/GRAPH_SCHEMA.md`: add the `area` and `project` node types, the four-value `origin` enum, the task fields `deadline` and `todoist_id`, and the § Todoist mapping section. Keep your own types and predicates.
 3. Add the § Todoist section to `meta/SETTINGS.md`, and `todoist_synced_at:` to the index frontmatter.
-4. Say "configure o Todoist": setup connects Todoist, binds your areas, and offers to schedule the sync. Then say "sync — push all pending" so every existing open task goes to Todoist.
+4. Say "configure o Todoist": setup connects Todoist, sets up the bucket project, and offers to schedule the sync. Then say "sync — push all pending" so every existing open task goes to Todoist.
 
 For anything older than v2.1, start from the README at tag `v2.1.0` in the template repository.
 

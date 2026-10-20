@@ -28,11 +28,12 @@ Interview the user with the AskUserQuestion tool (structured options); fall back
 2. **Node types.** Based on the purpose, propose a small set to create. Examples: work PMS → `person`, `team`, `meeting`; a book → `character`, `place`, `event`; learning material → `formula`, `recipe`, `term`. The user approves, adjusts, or rejects each. `entity`, `concept`, `area` and `project` always remain available, and `task` always exists (its schema is fixed — it is never proposed, extended, or removed).
 3. **Edges.** Ask whether the shipped predicate set in `meta/GRAPH_SCHEMA.md` § Edges needs PMS-specific additions — a book might want `ally_of` / `enemy_of`; a work PMS might want `owns` or `blocks`. Propose; the user approves. **Cover task relationships in this same question**, and start from the position that nothing needs adding: subtasks are `part_of`, blocked tasks `depends_on`, a task's subject is `about`, an extracted action item is `introduced_by`. Only propose a task predicate the shipped set genuinely cannot express. If the user approved a `person` node type in Q2, this is also the moment to offer promoting the task `owner` string field into an `assigned_to` typed edge.
 4. **Language.** What language should the *content* be written in — node titles, task titles, prose bodies, and answers? Default to the language the user is writing in, and offer the alternatives explicitly, because chat language and content language often differ (a user may write to you in Portuguese but want an English vault, or the reverse). This is the one setting that is expensive to change later: it is baked into every page title, and retitling pages breaks every wikilink pointing at them. Ask it even when the answer seems obvious.
-5. **Todoist areas.** This PMS owns the connected Todoist account. List its existing projects from the Step 0 read. **By default each one becomes an `area` node** bound to that project's id; the user may exclude any, e.g. a project shared by someone else, or one that will stay a plain list. Excluded projects stay unmanaged, and sync never touches them. **Say what binding means before the user answers:**
-   - every existing **section** in a bound project becomes a `project` node;
-   - every existing **task** in it will be adopted into the PMS by the first sync — give the count per project from the account read;
-   - a project full of old tasks the user doesn't want tracked is better excluded.
-   Take the plan (Free / Pro) from the account rather than asking: it sets `Plan` and `Deadlines` in `meta/SETTINGS.md` § Todoist. Do not create any Todoist project during setup — new areas are created when the first plan needs one.
+5. **Todoist bucket.** A PMS is usually about one subject, so it lives in **one** Todoist project, and the user's other projects and Inbox stay untouched. Ask where it should live, offering:
+   - **A new project named after this PMS** — recommended. It starts empty and nothing of the user's is adopted.
+   - **An existing project** — list them by name from the Step 0 read. Before the user picks, say what that implies: its existing **sections** become `project` nodes, and its existing **tasks** (give the count) are adopted by the first sync.
+   - **Several projects** — only if the user explicitly wants this PMS to manage more than one. Then each chosen project becomes an `area`, the same implications apply to each, and one of them is named the bucket for unplaced tasks. Record `Mode: multiple`.
+
+   The chosen project becomes the single `area` node (one per project in `multiple` mode). Record it as `Bucket`, record `Mode: single` unless the user chose several, and write a short slug of the PMS's name as `PMS id`. Take the plan (Free / Pro) from the account rather than asking: it sets `Plan` and `Deadlines` in `meta/SETTINGS.md` § Todoist. For a new project, ask sync to create it now (Mode 1, binding without tasks) so it appears in Todoist right away.
 6. **Schedule the sync.** Explain in one sentence why it matters: the sync is what brings phone completions into the PMS and unblocks the next steps, and Todoist Free keeps only one week of history. Then ask:
    - **Daily sync** — recommended; ask what time, in the user's timezone.
    - **Weekly quick lint** — optional.
@@ -43,13 +44,13 @@ Then write it down, to the right file:
 
 - **`meta/SETTINGS.md`** — the purpose under **Purpose**, the chosen language under **Language**, any convention the user changed, the § Todoist values from Step 0, Q5 and Q6, and `setup_done: true` in the frontmatter.
 - **`meta/GRAPH_SCHEMA.md`** — the approved types under **Nodes** and any new predicates under **Edges**.
-- **`knowledge/`** — one `area` node per Todoist project the user chose in Q5, from `meta/templates/area.md`, titled with the project's name (if the name has a character filenames reject, replace it and keep the original as an alias) and with `todoist_project_id` filled. For each existing section in it, one `project` node, from `meta/templates/project.md`, with `todoist_section_id` filled and `part_of` that area. Add them all to the index.
+- **`knowledge/`** — the bucket's `area` node (one per chosen project in `multiple` mode), from `meta/templates/area.md`. Title it with the project's name; if the name has a character filenames reject, replace it and keep the original as an alias. Fill `todoist_project_id`. For each existing section in an existing project, add one `project` node, from `meta/templates/project.md`, with `todoist_section_id` filled and `part_of` that area. Add them all to the index.
 - **`meta/templates/`** — one file per approved type, replicated from `meta/templates/_node.template.md`. Templates are optional; the user can skip them and add later when a kind of thing recurs enough to deserve structure. Never create or edit `_task.template.md` — the task shape is fixed.
 
 Then, if Todoist is connected:
 
 - **Push anything captured before setup** — sync Mode 1, "all pending".
-- **Offer a first sync** (Mode 2) to adopt the existing tasks in the bound projects. Tell the user how many there are; adopting them now saves the first scheduled run from a surprise.
+- **If an existing project was chosen, offer a first sync** (Mode 2) to adopt its tasks. Tell the user how many there are; adopting them now saves the first scheduled run from a surprise.
 
 Close with a one-line summary of what was configured and how to start: drop a file in `raw/` and ask to ingest, say what you need to do and it gets captured as a task, or ask to plan a goal.
 
@@ -66,10 +67,10 @@ For adding or amending node types, templates, or predicates after first run:
 
 **Connectors and schedules** are also handled here after first run:
 
-- "Connect Todoist" / "configure o Todoist" runs Step 0, then Q5 if no area is bound yet, then the push-pending step.
+- "Connect Todoist" / "configure o Todoist" runs Step 0, then Q5 if no bucket is bound yet, then the push-pending step.
 - "Schedule the sync" runs Q6.
 - Neither re-runs the whole interview.
 
-**Todoist bindings** are also a Mode 2 change: binding another existing Todoist project as an area, or unbinding one. Unbinding never touches Todoist. The area node keeps its history and its `todoist_project_id` is cleared. Its tasks' Todoist copies stay where they are but are no longer synced, and their files become *unplaced* until re-homed.
+**Todoist bindings** are also a Mode 2 change. Binding a second Todoist project switches the PMS to `multiple` mode — confirm the user wants that before doing it. Moving the bucket to another project is also a binding change, as is unbinding a project. Unbinding never touches Todoist. The area node keeps its history and its `todoist_project_id` is cleared. Its tasks' Todoist copies stay where they are but are no longer synced, and their files become *unplaced* until re-homed.
 
 Re-run the full Mode 1 interview only on request (or if the user sets `setup_done: false` again).

@@ -14,7 +14,8 @@ The bridge between the files and Todoist. **This skill is authoritative for ever
 
 ## Rules that apply in every mode
 
-- **The join key is the description footer `PMS: T-0042`**, the last line of every managed Todoist task's description. `todoist_id` in the file is a cache of the Todoist id, not identity. When a stored `todoist_id` no longer resolves, find the task again by searching for its footer, and **check the match is exact** — search is a substring match, so `PMS: T-004` also matches `T-0042`.
+- **Stay inside the bound projects.** Read and write only the Todoist projects bound to `area` nodes — in single mode, just the bucket. The Inbox and every other project belong to the user: never read them, never write to them, never adopt from them.
+- **The join key is the description footer `PMS: <pms-id>/T-0042`** (`<pms-id>` from `meta/SETTINGS.md` § Todoist), the last line of every managed Todoist task's description. `todoist_id` in the file is a cache of the Todoist id, not identity. When a stored `todoist_id` no longer resolves, find the task again by searching for its footer **within the bound projects only**. **Check the match is exact** — search is a substring match, so `PMS: x/T-004` also matches `x/T-0042`, and another PMS in the same account has its own `T-0042`.
 - **Labels merge, never replace.** Updating labels replaces the whole list. Read the task's current labels first, then add or remove only `pms-blocked` and `pms-dropped`. Any other label belongs to the user. **Verify the write:** the labels Todoist returns must still include every non-`pms-*` label that was there before. If one is missing, put it back at once and report it — losing a user's label is data loss, and nothing downstream can detect it later.
 - **Never delete anything in Todoist.** A dropped task is completed and labelled `pms-dropped`. A section or project for a finished PMS project is left in place; offer to archive it, never delete it.
 - **Never move a task's project, section or parent in Todoist unless the files say so.** Moves are structural, so the files own them. Send `projectId` / `sectionId` / `parentId` only when they change: each one is treated as a move, and a section move also lifts the task out from under its parent.
@@ -24,7 +25,7 @@ The bridge between the files and Todoist. **This skill is authoritative for ever
 - **No echo.** When sync calls capture to apply something that came *from* Todoist, it tells capture so. Capture then writes the file and does **not** call sync to push it back; otherwise every pulled change would bounce straight back to Todoist. Sync pushes the few things that do need to go back (an adopted task's footer, a recomputed label) itself.
 - **Record what you did.** A completed **pull** (Mode 2) ends by setting `todoist_synced_at` in `meta/GRAPH_INDEX.md` frontmatter to the current timestamp. A partial pull leaves it unchanged and says which step stopped. Pushes and reads don't touch it — it marks the last full reconcile.
 
-## Mode 1 — Push (called by capture, setup, and lint fixes)
+## Mode 1 — Push (called by capture, setup, plan, and lint fixes)
 
 Input: one or more task ids whose files changed, or "all pending" (every task file with no `todoist_id`).
 
@@ -33,8 +34,9 @@ Input: one or more task ids whose files changed, or "all pending" (every task fi
    - The area's `todoist_project_id` is the Todoist project; the project's `todoist_section_id` is the section.
    - A task `part_of` another task becomes a subtask of that task's `todoist_id`.
    - A task that reaches an area but no project goes in the area's project with no section.
-   - A task that reaches neither goes where `meta/SETTINGS.md` § Todoist sends unplaced tasks (default: Inbox).
-   - If the area or project has no Todoist binding yet, create it first (project for an area, section for a project), write the new id into that node's frontmatter, and include it in the report. If Todoist refuses the creation because of a plan limit, stop, report the limit, and suggest upgrading. Never work around it by putting the tasks somewhere else.
+   - A task that reaches neither goes to the bucket (the `Bucket` area in `meta/SETTINGS.md` § Todoist), outside any section. Never the Inbox.
+   - If the area or project has no Todoist binding yet, create it first (project for an area, section for a project), write the new id into that node's frontmatter, and include it in the report. In single mode, a new Todoist project is created only for the bucket, at setup. A second area means the user asked for `multiple` mode, so otherwise stop and ask.
+   - **Binding without tasks:** setup and plan may ask for just this step — create the bucket's project or a new project's section — so it shows up in Todoist before any task is pushed. If Todoist refuses the creation because of a plan limit, stop, report the limit, and suggest upgrading. Never work around it by putting the tasks somewhere else.
 2. **Parents before children.** Push in tree order so every `parentId` exists before its subtasks are sent.
 3. **Create or update.**
    - No `todoist_id` → search for the footer first (an earlier run may have created it and then stopped). Found → adopt that id. Not found → create.
@@ -51,13 +53,12 @@ Input: one or more task ids whose files changed, or "all pending" (every task fi
 
 ## Mode 2 — Pull (the reconcile; scheduled daily, or "sync")
 
-1. **Read the bindings.** Every `area` node with a `todoist_project_id` is a managed Todoist project. Read each one's active tasks (an overview grouped by section is the cheapest call), plus completed tasks since `todoist_synced_at` (or the last 7 days if unset). Read the **Inbox** the same way: unplaced tasks were pushed there, and it also holds the triage candidates. If `todoist_synced_at` is more than six days old, warn: Todoist Free keeps one week of activity history.
-2. **Match** each Todoist task to a file by its `PMS:` footer, and sort everything into five groups:
+1. **Read the bindings.** Every `area` node with a `todoist_project_id` is a managed Todoist project. Read each one's active tasks (an overview grouped by section is the cheapest call), plus completed tasks since `todoist_synced_at` (or the last 7 days if unset). Nothing else is read: no Inbox, no other project. If `todoist_synced_at` is more than six days old, warn: Todoist Free keeps one week of activity history.
+2. **Match** each Todoist task to a file by its `PMS:` footer, and sort everything into four groups:
    - **Matched** → step 3.
-   - **Todoist task with no footer, inside a managed project** → added on the phone. **Adopt it:** call capture (Mode A, `origin: capture`) with its title, due date, priority and placement. Placement is `part_of` the project node bound to its section, or the area node if it has no section, or its parent task if it is a subtask. Then push the footer back (Mode 1). Recurring tasks are the exception: leave them alone and list them once in the report.
+   - **Todoist task with no footer (or another PMS's footer — leave those alone), inside a bound project** → added on the phone. **Adopt it:** call capture (Mode A, `origin: capture`) with its title, due date, priority and placement. Placement is `part_of` the project node bound to its section, or the area node if it has no section, or its parent task if it is a subtask. Then push the footer back (Mode 1). Recurring tasks are the exception: leave them alone and list them once in the report.
    - **A section in a managed project that no `project` node is bound to** → created on the phone. Create the `project` node for it (from `meta/templates/project.md`, `part_of` the area, `todoist_section_id` set, title = section name), add it to the index, and report it. This is adoption, like the tasks inside it. Renames of known sections or projects on the phone are reported, not adopted, because files own structure.
    - **A non-terminal file whose task is neither active nor completed since the last sync** → fetch that task by `todoist_id`. Not found → it was deleted on the phone: do not delete the file, but call capture (Mode B) to set `status: dropped` with the note `deleted in Todoist on <date>`. Found completed → treat as matched (step 3).
-   - **Inbox items with no footer** → not adopted. List up to ten, newest first, as triage suggestions ("want any of these in the PMS?").
 3. **Apply the Todoist-owned fields to matched files** — through capture Mode B, not by editing files here:
    - completed in Todoist, open in the file → `done`, `closed` set to the completion date;
    - reopened in Todoist → back to `open`, `closed` removed;
@@ -78,7 +79,6 @@ Now unblocked (N): T-0051 "<title>" (was waiting on T-0042), …
 Adopted from Todoist (N): T-0060 "<title>" in <Area> / <Project>
 Dropped in Todoist (N): T-0033 "<title>"
 Needs a decision (N): T-0047 moved to <section> on the phone — update the plan, or move it back?
-Inbox triage (N): "<title>", …          (or "none")
 Pending push: N tasks still without a Todoist id   (or "none")
 ```
 
@@ -86,8 +86,8 @@ Pending push: N tasks still without a Todoist id   (or "none")
 
 Three kinds of read, never a write:
 
-- **Account** (setup Step 0 and Q5): account name, plan (Free or Pro), and the list of projects with their sections and active-task counts. This read is also the connection probe.
-- **Task state** (query): for "what's on my plate", "what's due" or "what's blocked", read the managed projects and the Inbox. Use the date-range read for due questions and the label read for `pms-blocked`. Return id (from the footer), title, due date, labels and Todoist link.
-- **Per-area snapshot** (lint #20): one read per managed area, returning every task with its footer, completion state and labels.
+- **Account** (setup Step 0 and Q5): account name, plan (Free or Pro), and the list of projects with their sections and active-task counts — names and counts only, so the user can pick a bucket. Task contents of unbound projects are never read. This read is also the connection probe.
+- **Task state** (query): for "what's on my plate", "what's due" or "what's blocked", read the bound projects only. Use the date-range read for due questions and the label read for `pms-blocked`. Return id (from the footer), title, due date, labels and Todoist link.
+- **Per-area snapshot** (lint #20): one read per bound area, returning every task with its footer, completion state and labels.
 
 **Do not write anything in this mode** — not files, not Todoist. If Todoist is unreachable, say so; query then falls back to the index and labels its answer with the index's `todoist_synced_at`.

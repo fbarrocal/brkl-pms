@@ -10,7 +10,7 @@ Node types active in this PMS. Every page in `knowledge/` declares one in its `t
 
 - **`entity`** — a specific thing (a person, place, work, object, event). Fields: `title`, `aliases`, `tags`, typed-edge fields, `sources`, `see_also`. Template: none (follows the generic seed `meta/templates/_node.template.md` shape).
 - **`concept`** — an idea, theme, or topic. Fields: same as `entity`. Template: none (same seed shape).
-- **`area`** — a standing sphere of responsibility (health, a job, a hobby). Maps to a **Todoist project**. Fields: `title`, `aliases`, `tags`, `todoist_project_id`, typed-edge fields, `see_also`. Template: `meta/templates/area.md`. Areas are long-lived; finished work closes at the project level, not the area level.
+- **`area`** — a standing sphere of responsibility (health, a job, a hobby). Maps to a **Todoist project**. In the default single mode there is exactly **one** area — the PMS's bucket in Todoist, usually named after the PMS itself. More than one exists only in `multiple` mode (`meta/SETTINGS.md` § Todoist). Fields: `title`, `aliases`, `tags`, `todoist_project_id`, typed-edge fields, `see_also`. Template: `meta/templates/area.md`. Areas are long-lived; finished work closes at the project level, not the area level.
 - **`project`** — a finite outcome with an end (move flat, launch X). Maps to a **section** of its area's Todoist project. Fields: `title`, `aliases`, `tags`, `todoist_section_id`, `part_of` (its area), optional `outcome`, typed-edge fields, `see_also`. Template: `meta/templates/project.md`.
 
 `area` and `project` ship with the template and are always present. They are written by setup (binding existing Todoist projects and sections), by plan (new projects and areas), and by sync (sections created on the phone) — never by ingest from a source. That is why they are exempt from the provenance requirement: they record an intent, not something learned from a source.
@@ -60,7 +60,7 @@ Fixed by the rulebook, like the task schema. The sync skill applies it.
 | `area` node | project (`todoist_project_id`) | files |
 | `project` node | section in its area's project (`todoist_section_id`) | files |
 | task `part_of` a project | task in that section | files (placement) |
-| task `part_of` an area, no project | task in the area's project, no section | files (placement) |
+| task `part_of` an area, no project — or with no placement at all | task in the area's project (the bucket, in single mode), no section | files (placement) |
 | task `part_of` a task | subtask | files (placement) |
 | task with children, created by plan | **uncompletable** parent | files |
 | `depends_on` | `pms-blocked` label + `Waiting on:` description line | files (recomputed by sync) |
@@ -70,7 +70,7 @@ Fixed by the rulebook, like the task schema. The sync skill applies it.
 | `due` | due date | **Todoist** |
 | `deadline` | deadline (Pro only; see `meta/SETTINGS.md` § Todoist) | **Todoist** when enabled, else files |
 | `title` | content | **Todoist** after creation |
-| `id` | description footer `PMS: T-0042` | files |
+| `id` | description footer `PMS: <pms-id>/T-0042` | files |
 | `priority` | priority | **Todoist** |
 | other labels, reminders | as in Todoist | **Todoist** (never copied into files) |
 
