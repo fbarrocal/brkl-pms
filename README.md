@@ -6,7 +6,7 @@ This repository holds a portable Personal Management System template in `pms/`. 
 output/
 ├── CLAUDE.md     ← builder rules: variants are artifacts, not instructions
 ├── docs/         ← design record (decisions, ADRs, field-test protocol, v1 handover)
-└── pms/          ← the template, v2.6.0 — PMS with Todoist as the task surface (ADR-001)
+└── pms/          ← the template, v2.6.1 — PMS with Todoist as the task surface (ADR-001)
 ```
 
 **To use it:** copy `pms/` out, rename it to whatever the system is for, and follow its own `README.md`. It has no dependency on this repository.

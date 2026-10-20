@@ -74,7 +74,7 @@ If a pass is running long, **stop and report what you have**, naming the checks 
 20. **Todoist drift (remote).** Ask sync for a per-area snapshot (Mode 3, one call per bound area — nothing outside them) and compare:
     - **Orphans in Todoist.** A task inside a bound project with no `PMS:` footer — sync will adopt it on the next pull; report it here only if it's older than the last sync, because that means adoption is failing.
     - **Orphans in the files.** A `todoist_id` in the root of `tasks/` that Todoist doesn't have, active or completed. Archived tasks are exempt — Todoist may have aged out their completion records.
-    - **State disagreement.** Done in one, open in the other; `pms-blocked` present while every dependency is finished, or missing while one isn't; a grouping task that is completable in Todoist; a Todoist parent completed while the files still have open children.
+    - **State disagreement.** Done in one, open in the other; `pms-blocked` present while every dependency is finished, or missing while one isn't; a grouping task that is completable in Todoist (its name lacks the `* ` header marker); a task file whose title starts with `* ` (the marker leaked into the file); a Todoist parent completed while the files still have open children.
     Fixes go through sync. Lint never writes to Todoist itself.
 
 ### Pass C — is the content true

@@ -42,7 +42,7 @@ Input: one or more task ids whose files changed, or "all pending" (every task fi
    - No `todoist_id` → search for the footer first (an earlier run may have created it and then stopped). Found → adopt that id. Not found → create.
    - Has `todoist_id` → update only what changed on the files' side: description body, labels (merged), placement (only if moved in the files), `isUncompletable` for grouping tasks, and title, due or priority **only when the change came from chat** (on a pull, Todoist owns those).
    - **Description:** the task's context line(s), then `Waiting on: T-0041 (<title>)` lines for each unfinished `depends_on` target, then `Deadline: <date>` if the task has one and Deadlines are `off`, then a blank line and `PMS: T-0042`.
-   - **Grouping tasks** (any task with `part_of` children that was created by `plan`) are pushed as **uncompletable** headers. Completing a Todoist parent completes all its open subtasks, so a tickable parent is a one-tap way to falsely finish a whole branch.
+   - **Grouping tasks** (any task with `part_of` children that was created by `plan`) are pushed as **uncompletable** headers. Completing a Todoist parent completes all its open subtasks, so a tickable parent is a one-tap way to falsely finish a whole branch. **Todoist marks a header by prefixing its name with `* `** (`1. Agendar` comes back as `* 1. Agendar`). That prefix is Todoist's marker, not part of the title: never write it into the file, and remove it when clearing `isUncompletable`.
 4. **Status out** (children before parents for terminal states):
    - `blocked` → label `pms-blocked`.
    - `open` / `doing` → no `pms-blocked` label. `doing` itself is not mirrored.
@@ -62,7 +62,7 @@ Input: one or more task ids whose files changed, or "all pending" (every task fi
 3. **Apply the Todoist-owned fields to matched files** — through capture Mode B, not by editing files here:
    - completed in Todoist, open in the file → `done`, `closed` set to the completion date;
    - reopened in Todoist → back to `open`, `closed` removed;
-   - due date, priority, title changed in Todoist → copy into the file. After a title change, update the task's index entry. Links stay valid because they resolve by file stem; their display text is now stale, which lint reports as housekeeping.
+   - due date, priority, title changed in Todoist → copy into the file. **Compare titles without a leading `* `**: on a grouping task it is the header marker, not a rename. Without this, every pull would report every phase as renamed. After a title change, update the task's index entry. Links stay valid because they resolve by file stem; their display text is now stale, which lint reports as housekeeping.
    - moved to a different section, project or parent in Todoist → **do not adopt silently.** Report it and ask whether to update the task's `part_of` / `about` to match, or move it back.
 4. **Recompute what is blocked — this is the planner's main job.**
    - For every non-terminal task with `depends_on`: it is blocked if any target is non-terminal, and unblocked when all are `done` or `dropped`.
