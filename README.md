@@ -1,4 +1,4 @@
-# PMS template — repository
+# brkl-pms — PMS template repository
 
 This repository holds a portable Personal Management System template in `pms/`. Any further top-level folder is a temporary A/B **variant** of it. Each one is complete and self-contained: its own `CLAUDE.md`, its own `meta/`, its own `.gitignore`. Nothing is shared between them, deliberately — a variant you can't copy out and use on its own isn't a template.
 
@@ -21,7 +21,7 @@ Every variant's `CLAUDE.md` is written as an operating manual for a *running* sy
 
 ## Versions
 
-- **v1.x** — *kbcurator*: the original knowledge-base template (git history up to tag `v1.1.0`; design record in `docs/handover/`).
+- **v1.x** — *kbcurator* (this repository's name until v2.6.1): the original knowledge-base template (git history up to tag `v1.1.0`; design record in `docs/handover/`).
 - **v2.x** — the Personal Management System. `v2.0.0` added the task layer and `v2.1.0` stabilized it, with tasks living only in files. From `v2.2.0`, Todoist is the task surface. From `v2.4.0`, that is the only template; the files-only PMS lives on in git history. `v2.5.0` is a full-review hardening pass; `v2.6.0` puts each PMS in a single Todoist project, its bucket.
 
 ## Where the reasoning lives
