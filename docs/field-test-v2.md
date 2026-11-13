@@ -33,4 +33,4 @@ Nothing in v2 has been run against real material. This protocol tests the behavi
 
 ## After the run
 
-Bring the notes back here and continue the usual loop: fix the spec rather than the symptom, record the *why* in `decisions-v2.md`, run a stale-reference sweep, bump the version, tag.
+Bring the notes back here and continue the usual loop: fix the spec rather than the symptom (in `ext/`, or in brkl-kb for anything that isn't about tasks or Todoist — see `adr/002-kb-core-split.md`), rebuild, record the *why* in `decisions-v2.md`, run a stale-reference sweep, bump the version, tag.

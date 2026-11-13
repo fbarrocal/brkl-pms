@@ -1,0 +1,26 @@
+{
+  "repository": "https://github.com/fbarrocal/brkl-kb",
+  "tag": "v1.2.0",
+  "commit": "90ea8b110da27722380e22d4aa20015c13ed29bb",
+  "version": "1.2.0",
+  "files": {
+    "core.json": "c42d988170ab30fd759ee1ab502b2e2621129e0c8da781b20e458f6499491727",
+    "core/.gitattributes": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+    "core/.gitignore": "6d078a8fd7c1fcda789479839b70e229cb23cecd5a0c24f25227e6d013175921",
+    "core/CLAUDE.md": "81662e17c63c584b53e659e7386fa1e6f88e6b4cdf1841016335c65053011dd9",
+    "core/README.md": "345e53ff6b3af4b8d64e6c40c83345ebf3b92571479fdf5fe7c8386c2cdcd6ad",
+    "core/knowledge/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "core/meta/GRAPH_INDEX.md": "2f87741020fc01e1aa978f80b504ecde2be97023f8cfb4f2bee28488cc602adf",
+    "core/meta/GRAPH_SCHEMA.md": "50900327c1e29f35525c2e2fcc0d6e00951c962f8178f53098102d3381888d9a",
+    "core/meta/SETTINGS.md": "2f2185c4aa9b5759f2103ba790aa0217d992ee80ba4c1aae5046d6bde8d8efa9",
+    "core/meta/skills/ingest/SKILL.md": "7a62c0ff9c517b00d93a0c71b1987e4c3590ea0646ffecc90bbc3966f74b648f",
+    "core/meta/skills/lint/SKILL.md": "f669f844e7cb685ff593dd59cc5270ea4b6b46ed1c192a9b281fff37d14213de",
+    "core/meta/skills/query/SKILL.md": "4b7ca6f78fff558d36f55bd7b6fa0581fc2145b2e6898c2cf692df113b7659c1",
+    "core/meta/skills/setup/SKILL.md": "264a48c8a2af64545418938e60251209c9beb23bca78267bc83c8b31153627f1",
+    "core/meta/templates/_node.template.md": "2f0a874460adcca5fd3f7cbd991196f50cfa78caa0dbd44498137e3632f71edf",
+    "core/raw/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tools/assemble.py": "dcb6eeccd5842d492c50aaed743ddb66111f6f4ec4c32bd8ac4789acfc5eaf2b",
+    "tools/build.py": "21f99997060bea48ea3b016fe44b80a6cb349bb0bd7f1af97eafcfc106da8614",
+    "tools/check.py": "1ce8ab450bb2514aeff020b50fb03ca7fe3a7bbad8b2f4b9ac88e2642bc6a841"
+  }
+}

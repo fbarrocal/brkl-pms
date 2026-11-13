@@ -32,7 +32,7 @@ It contains:
 ## How to absorb it (instructions for a Claude session)
 
 1. Read the numbered docs **in order** (`01` → `07`) — as history. Read the v2.0.0 notice at the top of this file first, so you know which parts have been superseded.
-2. Then browse the **live template in `pms/`** at the repository root, starting with `pms/README.md`, then `pms/CLAUDE.md`, then `pms/meta/GRAPH_SCHEMA.md`, then the skills under `pms/meta/skills/` (seven as of v2.6: setup, capture, plan, ingest, query, sync, lint). (Docs below refer to a `template/` folder; that is the v1.0.1 path and no longer exists.)
+2. Then browse the **live template in `pms/`** at the repository root, starting with `pms/README.md`, then `pms/CLAUDE.md`, then `pms/meta/GRAPH_SCHEMA.md`, then the skills under `pms/meta/skills/` (seven as of v2.6: setup, capture, plan, ingest, query, sync, lint). Since v2.7, `pms/` is built from the brkl-kb core plus `ext/` — read `pms/`, but edit the sources (`../adr/002-kb-core-split.md`). (Docs below refer to a `template/` folder; that is the v1.0.1 path and no longer exists.)
 3. After that you should be able to: explain the architecture and *why* each part is shaped that way; continue development without breaking the invariants (see `04`, as amended by the notice above); and help build the next phase (guardrails, validators, a development harness).
 
 ## One critical warning — do not run the template

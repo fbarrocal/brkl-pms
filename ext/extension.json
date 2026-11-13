@@ -1,0 +1,10 @@
+{
+  "name": "brkl-pms",
+  "version": "2.7.0",
+  "requires_core": "^1.2.0",
+  "vars": {
+    "SYS": "PMS",
+    "sys": "pms",
+    "SYSTEM": "Personal Management System"
+  }
+}
