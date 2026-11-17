@@ -1,6 +1,6 @@
 # ADR-002 — The knowledge base is its own template; the PMS builds on it
 
-- **Status:** Accepted (2026-11-13). Introduced in v2.7.0, on brkl-kb v1.2.0.
+- **Status:** Superseded by ADR-003 (2026-11-17). Accepted 2026-11-13 and shipped in v2.7.0 only.
 - **Decider:** Fernando
 
 ## Context

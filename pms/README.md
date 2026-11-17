@@ -1,6 +1,6 @@
 # Personal Management System template
 
-**v2.7.0** — the PMS (a knowledge graph with a task layer) with **Todoist as the task surface**. The PMS plans: it breaks goals into tasks, tracks what waits on what, and links work to what you know. Todoist is where you see, get reminded about, and tick off the tasks, on every device. The files own structure; Todoist owns execution state. Design record: `docs/adr/001-todoist-task-surface.md` in the template repository.
+**v2.8.0** — the PMS (a knowledge graph with a task layer) with **Todoist as the task surface**. The PMS plans: it breaks goals into tasks, tracks what waits on what, and links work to what you know. Todoist is where you see, get reminded about, and tick off the tasks, on every device. The files own structure; Todoist owns execution state. Design record: `docs/adr/001-todoist-task-surface.md` in the template repository.
 
 It needs the **Todoist connector** enabled in Claude; setup asks you to connect it. Without it, the knowledge side works and tasks queue up as *pending push*.
 

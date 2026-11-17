@@ -1,9 +1,0 @@
-{
-  "name": "brkl-kb core",
-  "version": "1.2.0",
-  "vars": {
-    "SYS": "KB",
-    "sys": "kb",
-    "SYSTEM": "Knowledge Base"
-  }
-}

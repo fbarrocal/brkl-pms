@@ -117,3 +117,13 @@ Fernando's decision: the knowledge base becomes its own template again, in its o
 - **Two repositories, not one** (Fernando's call over a monorepo recommendation): the KB gets its own identity and releases. The accepted cost is that a new slot means a brkl-kb release, then a vendor bump here.
 - **Conventions changed.** The version lives in `ext/extension.json`, not `pms/README.md`. `pms/` and `vendor/kb/` are never edited by hand (`tools/build.py --check`). A/B siblings are still hand-edited copies of `pms/`; the winner gets ported into `ext/`.
 - **Left as it was, on purpose, to keep the build identical:** the fixed task schema and Todoist mapping still live in the mutable `meta/GRAPH_SCHEMA.md`, which means a rulebook upgrade can't propagate by copying static files. And 180 fine-grained slots. Both are next-pass work (ADR-002 § Consequences).
+
+## v2.8.0 (2026-11-17) — self-contained again
+
+Fernando's decision, reversing v2.7.0: the PMS and the knowledge base are independent projects, so `pms/` is no longer built from an external core. Full record: `adr/003-self-contained-template.md`.
+
+- `vendor/`, `ext/` and `tools/` removed. `pms/` is the template and the only copy, edited directly: no build, no check, no pin.
+- `pms/` is unchanged apart from its version line, so its text is still v2.6.1's. Nothing in it ever referred to the external core.
+- Conventions restored: bump the version in `pms/README.md` and tag. A/B variants are hand-edited `pms-*/` siblings.
+- The builder docs (`CLAUDE.md`, `README.md`, `field-test-v2.md`, `handover/000_READ_FIRST.md`) are back to their v2.6.1 wording, plus ADR-003 and a self-containment invariant.
+- Why the reversal is right on its own terms: the build existed only so two templates could share text. With sharing ruled out it had no job left, and it added a step to every change.
