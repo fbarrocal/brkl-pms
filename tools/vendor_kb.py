@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pin the KB core that the PMS is built on.
 
-    python tools/vendor_kb.py --from ../kbcurator --tag v1.2.0   # copy core/, core.json, tools/ from that tag
+    python tools/vendor_kb.py --from ../brkl-kb --tag v1.2.0     # copy core/, core.json, tools/ from that tag
     python tools/vendor_kb.py --verify                           # vendor/kb/ still matches its pin
 
 The copy comes from the tag through `git archive`, not from the KB repo's working tree, so
