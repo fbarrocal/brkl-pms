@@ -127,3 +127,13 @@ Fernando's decision, reversing v2.7.0: the PMS and the knowledge base are indepe
 - Conventions restored: bump the version in `pms/README.md` and tag. A/B variants are hand-edited `pms-*/` siblings.
 - The builder docs (`CLAUDE.md`, `README.md`, `field-test-v2.md`, `handover/000_READ_FIRST.md`) are back to their v2.6.1 wording, plus ADR-003 and a self-containment invariant.
 - Why the reversal is right on its own terms: the build existed only so two templates could share text. With sharing ruled out it had no job left, and it added a step to every change.
+
+## v2.8.1 (2026-11-17) — fixes ported from brkl-kb v1.3.1
+
+All five graph-rule fixes from brkl-kb's stale-reference audit applied here too; PMS had every one of the bugs.
+
+- **Ingest now updates the index before archiving the source (steps 10 and 11 swapped).** The "if you can't finish" section rested on archiving being the last act, but the index update ran after it. An interruption between the two left a source archived, so it looked done, while its knowledge pages were missing from the index. Now a source that still looks pending is the only sign of an unfinished ingest, which is the state the recovery rule already assumes. Step 8's "use the archived path" note now points at step 11.
+- **Lint check numbers are written into the text, not as Markdown list markers.** Out-of-sequence markers (1, 2, 3, 8, … 19; 4, … 20) are renumbered by any CommonMark renderer, so in Obsidian or on GitHub the numbers stopped matching the pass table and severity bands. The agent reads raw text and wasn't affected; humans were.
+- **Lint #17 cites the right source.** It credited `CLAUDE.md` with naming the "Page X … through edge W" failure mode; that example lives in the query skill, and `CLAUDE.md` states the rule (§ Role).
+- **Lint scope and example report match the rules.** Scope now names `raw/archive/` for #18's source re-reads; the Pass A example lists `raw/` as scanned, since #8 and #12 scan it.
+- **Default `entity`/`concept` types list the seed's bookkeeping fields** (`created`, `updated`, `curator_notes`). Lint #2 compares fields against § Nodes, so the shorter list invited false drift reports.
